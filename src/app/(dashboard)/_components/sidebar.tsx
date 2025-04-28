@@ -3,6 +3,7 @@
 import {
   BarChartIcon,
   CreditCardIcon,
+  HistoryIcon,
   HomeIcon,
   SettingsIcon,
 } from "lucide-react";
@@ -30,6 +31,11 @@ const mainNavLinks = [
     name: "Analytics",
     url: "/analytics",
     icon: BarChartIcon,
+  },
+  {
+    name: "History",
+    url: "/history",
+    icon: HistoryIcon,
   },
 ];
 
