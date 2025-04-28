@@ -1,9 +1,10 @@
 import Image from "next/image";
 
-import { SearchIcon, SparkleIcon } from "lucide-react";
+import { SparkleIcon } from "lucide-react";
 
-import { Button } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
+
+import VideoFactCheckerForm from "./video-fact-checker-form";
 
 export default function Page() {
   return (
@@ -23,16 +24,7 @@ export default function Page() {
           </h1>
         </div>
         <div>
-          <div className="h-12 rounded-full flex items-center gap-2 border pr-1 w-[35vw] min-w-[350px] bg-accent">
-            <input
-              type="url"
-              placeholder="Paste a video link here"
-              className="bg-transparent border-none outline-none flex-1 px-4"
-            />
-            <Button size="icon" className="rounded-full bg-pink-600">
-              <SearchIcon className="w-4 h-4" />
-            </Button>
-          </div>
+          <VideoFactCheckerForm />
         </div>
       </section>
     </div>
