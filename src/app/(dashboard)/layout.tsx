@@ -13,7 +13,7 @@ export default function Layout({ children }: LayoutProps) {
     <SidebarProvider>
       <DashboardSidebar />
       <SidebarInset>
-        <div className="p-8">{children}</div>
+        <div>{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );
