@@ -24,7 +24,7 @@ import NavUser from "./user-nav";
 const mainNavLinks = [
   {
     name: "Dashboard",
-    url: "/dashboard",
+    url: "/",
     icon: HomeIcon,
   },
   {
