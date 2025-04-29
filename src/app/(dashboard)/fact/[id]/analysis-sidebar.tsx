@@ -16,7 +16,7 @@ export default function AnalysisSidebar({ fact }: { fact: Fact }) {
   }
 
   return (
-    <aside className="h-screen bg-accent/20 border rounded-2xl">
+    <aside className="min-h-screen bg-accent/20 border rounded-2xl">
       <div className="flex flex-col gap-4">
         <div aria-label="Tabs" className="flex">
           <button

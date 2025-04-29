@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { kv } from "~/lib/kv";
 import { factSchema } from "~/lib/validations";
 
+import FactCheckerForm from "../../_components/fact-checker-form";
 import AnalysisSidebar from "./analysis-sidebar";
 
 function getScoreCategory(score: number) {
@@ -157,98 +158,103 @@ export default async function FactIDPage({
   const fact = factSchema.parse(dbFact);
 
   return (
-    <div className="grid grid-cols-5">
-      <div className="col-span-3">
-        <section className="grid grid-cols-2 gap-4 p-8">
-          <div className="flex flex-col gap-2">
-            <h1 className="text-sm font-medium">{fact.videoDetails.title}</h1>
-            <img
-              src={fact.videoDetails.thumbnail}
-              alt={fact.videoDetails.title}
-              className="w-full h-auto rounded-xl"
-            />
-            <a
-              href={fact.videoDetails.url}
-              target="_blank"
-              className="text-xs text-muted-foreground line-clamp-1"
-            >
-              {fact.videoDetails.url}
-            </a>
-          </div>
-          <div className="flex flex-col items-center justify-center">
-            <CircularProgress score={fact.score} />
-            {/* <div className="flex gap-2">
-              <Button variant="default">Download Fact Analysis</Button>
-            </div> */}
-          </div>
-        </section>
-        <section className="p-8">
-          <div className="bg-white rounded-lg">
-            <div className="flex items-center justify-between px-6 py-4 border-b">
-              <h2 className="text-lg font-medium">Claim Analysis</h2>
-              <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  placeholder="Search claims..."
-                  className="px-3 py-1 text-sm border rounded-md w-48 focus:outline-none focus:ring-1 focus:ring-primary"
-                />
-              </div>
+    <div>
+      <header className="p-8 w-full flex justify-center">
+        <FactCheckerForm />
+      </header>
+      <div className="grid grid-cols-5">
+        <div className="col-span-3">
+          <section className="grid grid-cols-2 gap-4 p-8">
+            <div className="flex flex-col gap-2">
+              <h1 className="text-sm font-medium">{fact.videoDetails.title}</h1>
+              <img
+                src={fact.videoDetails.thumbnail}
+                alt={fact.videoDetails.title}
+                className="w-full h-auto rounded-xl"
+              />
+              <a
+                href={fact.videoDetails.url}
+                target="_blank"
+                className="text-xs text-muted-foreground line-clamp-1"
+              >
+                {fact.videoDetails.url}
+              </a>
             </div>
-            <table className="w-full border-collapse border border-gray-200">
-              <thead>
-                <tr className="text-left bg-gray-50">
-                  <th className="px-6 py-3 text-xs font-medium text-muted-foreground border border-gray-200">
-                    <div className="flex items-center gap-1">Claim</div>
-                  </th>
-                  <th className="px-6 py-3 text-xs font-medium text-muted-foreground w-24 border border-gray-200">
-                    <div className="flex items-center gap-1">Score</div>
-                  </th>
-                  <th className="px-6 py-3 text-xs font-medium text-muted-foreground w-24 text-right border border-gray-200">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {fact.claims.map((claim, index) => (
-                  <tr key={index} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm border border-gray-200">
-                      {claim.claim}
-                    </td>
-                    <td className="px-6 py-4 border border-gray-200">
-                      <CircularProgress
-                        score={claim.score}
-                        size="small"
-                        showLabel={true}
-                      />
-                    </td>
-                    <td className="px-6 py-4 text-right border border-gray-200">
-                      <button className="text-muted-foreground hover:text-foreground">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <circle cx="12" cy="12" r="1"></circle>
-                          <circle cx="19" cy="12" r="1"></circle>
-                          <circle cx="5" cy="12" r="1"></circle>
-                        </svg>
-                      </button>
-                    </td>
+            <div className="flex flex-col items-center justify-center">
+              <CircularProgress score={fact.score} />
+              {/* <div className="flex gap-2">
+                <Button variant="default">Download Fact Analysis</Button>
+              </div> */}
+            </div>
+          </section>
+          <section className="p-8">
+            <div className="bg-white rounded-lg">
+              <div className="flex items-center justify-between px-6 py-4 border-b">
+                <h2 className="text-lg font-medium">Claim Analysis</h2>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    placeholder="Search claims..."
+                    className="px-3 py-1 text-sm border rounded-md w-48 focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                </div>
+              </div>
+              <table className="w-full border-collapse border border-gray-200">
+                <thead>
+                  <tr className="text-left bg-gray-50">
+                    <th className="px-6 py-3 text-xs font-medium text-muted-foreground border border-gray-200">
+                      <div className="flex items-center gap-1">Claim</div>
+                    </th>
+                    <th className="px-6 py-3 text-xs font-medium text-muted-foreground w-24 border border-gray-200">
+                      <div className="flex items-center gap-1">Score</div>
+                    </th>
+                    <th className="px-6 py-3 text-xs font-medium text-muted-foreground w-24 text-right border border-gray-200">
+                      Actions
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </div>
-      <div className="col-span-2 p-4">
-        <AnalysisSidebar fact={fact} />
+                </thead>
+                <tbody>
+                  {fact.claims.map((claim, index) => (
+                    <tr key={index} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 text-sm border border-gray-200">
+                        {claim.claim}
+                      </td>
+                      <td className="px-6 py-4 border border-gray-200">
+                        <CircularProgress
+                          score={claim.score}
+                          size="small"
+                          showLabel={true}
+                        />
+                      </td>
+                      <td className="px-6 py-4 text-right border border-gray-200">
+                        <button className="text-muted-foreground hover:text-foreground">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <circle cx="12" cy="12" r="1"></circle>
+                            <circle cx="19" cy="12" r="1"></circle>
+                            <circle cx="5" cy="12" r="1"></circle>
+                          </svg>
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+        <div className="col-span-2 p-4">
+          <AnalysisSidebar fact={fact} />
+        </div>
       </div>
     </div>
   );

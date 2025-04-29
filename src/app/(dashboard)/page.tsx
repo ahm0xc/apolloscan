@@ -4,7 +4,7 @@ import { SparkleIcon } from "lucide-react";
 
 import { cn } from "~/lib/utils";
 
-import FactCheckerForm from "./fact-checker-form";
+import FactCheckerForm from "./_components/fact-checker-form";
 
 export default function Page() {
   return (

@@ -8,8 +8,13 @@ import { Loader2Icon, SearchIcon } from "lucide-react";
 
 import { checkFact } from "~/actions/server-actions";
 import { Button } from "~/components/ui/button";
+import { cn } from "~/lib/utils";
 
-export default function FactCheckerForm() {
+interface FactCheckerFormProps {
+  className?: string;
+}
+
+export default function FactCheckerForm({ className }: FactCheckerFormProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
@@ -39,7 +44,10 @@ export default function FactCheckerForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="h-12 rounded-full flex items-center gap-2 border pr-1 w-[35vw] min-w-[350px] bg-accent"
+      className={cn(
+        "h-12 rounded-full flex items-center gap-2 border pr-1 w-[35vw] min-w-[350px] bg-accent",
+        className
+      )}
     >
       <input
         type="url"
