@@ -4,7 +4,7 @@ import { SparkleIcon } from "lucide-react";
 
 import { cn } from "~/lib/utils";
 
-import VideoFactCheckerForm from "./video-fact-checker-form";
+import FactCheckerForm from "./fact-checker-form";
 
 export default function Page() {
   return (
@@ -24,7 +24,7 @@ export default function Page() {
           </h1>
         </div>
         <div>
-          <VideoFactCheckerForm />
+          <FactCheckerForm />
         </div>
       </section>
     </div>
