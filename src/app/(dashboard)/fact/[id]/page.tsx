@@ -166,7 +166,9 @@ export default async function FactIDPage({
         <div className="col-span-3">
           <section className="grid grid-cols-2 gap-4 p-8">
             <div className="flex flex-col gap-2">
-              <h1 className="text-sm font-medium">{fact.videoDetails.title}</h1>
+              <h1 className="text-sm font-medium">
+                TITLE: {fact.videoDetails.title}
+              </h1>
               <img
                 src={fact.videoDetails.thumbnail}
                 alt={fact.videoDetails.title}
