@@ -2,7 +2,7 @@
 
 import { YoutubeTranscript } from 'youtube-transcript';
 import * as z from "zod";
-import { isYoutubeVideoUrl } from "~/lib/utils";
+import { extractYouTubeVideoId, isYoutubeVideoUrl } from "~/lib/utils";
 
 const CheckFactPayloadSchema = z.object({
     url: z.string().url().refine(
@@ -20,7 +20,15 @@ export async function checkFact(payload: z.infer<typeof CheckFactPayloadSchema>)
     }
     payload = result.data;
 
-    const transcript = await YoutubeTranscript.fetchTranscript(payload.url);
+    const videoId = extractYouTubeVideoId(payload.url);
+
+    if (!videoId) {
+        return {
+            error: "Invalid YouTube video URL",
+        }
+    }
+
+    const transcript = await YoutubeTranscript.fetchTranscript(videoId);
     const plainTranscript = transcript.map(({ text }) => {
         return text
             .replace(/&amp;/g, '&')
@@ -31,5 +39,7 @@ export async function checkFact(payload: z.infer<typeof CheckFactPayloadSchema>)
             .replace(/&nbsp;/g, ' ');
     }).join(" ");
 
-    console.log("🚀 ~ checkFact ~ transcript:", plainTranscript)
+    const videoDetailsRes = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`)
+    const videoDetails = await videoDetailsRes.json();
+    console.log("🚀 ~ checkFact ~ videoDetails:", videoDetails)
 }
