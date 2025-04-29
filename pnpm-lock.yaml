@@ -15,12 +15,6 @@ importers:
       '@ai-sdk/google':
         specifier: ^1.2.14
         version: 1.2.14(zod@3.24.1)
-      '@ai-sdk/openai':
-        specifier: ^1.3.20
-        version: 1.3.20(zod@3.24.1)
-      '@ai-sdk/perplexity':
-        specifier: ^1.1.8
-        version: 1.1.8(zod@3.24.1)
       '@radix-ui/react-avatar':
         specifier: ^1.1.7
         version: 1.1.7(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -153,18 +147,6 @@ packages:
 
   '@ai-sdk/google@1.2.14':
     resolution: {integrity: sha512-r3FSyyWl0KVjUlKn5o+vMl+Nk8Z/mV6xrqW+49g7fMoRVr/wkRxJZtHorrdDGRreCJubZyAk8ziSQSLpgv2H6w==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      zod: ^3.0.0
-
-  '@ai-sdk/openai@1.3.20':
-    resolution: {integrity: sha512-/DflUy7ROG9k6n6YTXMBFPbujBKnbGY58f3CwvicLvDar9nDAloVnUWd3LUoOxpSVnX8vtQ7ngxF52SLWO6RwQ==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      zod: ^3.0.0
-
-  '@ai-sdk/perplexity@1.1.8':
-    resolution: {integrity: sha512-hdyMknEKRhUr4AwIswUNsrT5XdQ35tZl9jAiyi1VbhxfW0mCr5dxPt/nYWYN0sc+2m7yfG3L3D5J5V7GIJiqzg==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.0.0
@@ -2867,18 +2849,6 @@ packages:
 snapshots:
 
   '@ai-sdk/google@1.2.14(zod@3.24.1)':
-    dependencies:
-      '@ai-sdk/provider': 1.1.3
-      '@ai-sdk/provider-utils': 2.2.7(zod@3.24.1)
-      zod: 3.24.1
-
-  '@ai-sdk/openai@1.3.20(zod@3.24.1)':
-    dependencies:
-      '@ai-sdk/provider': 1.1.3
-      '@ai-sdk/provider-utils': 2.2.7(zod@3.24.1)
-      zod: 3.24.1
-
-  '@ai-sdk/perplexity@1.1.8(zod@3.24.1)':
     dependencies:
       '@ai-sdk/provider': 1.1.3
       '@ai-sdk/provider-utils': 2.2.7(zod@3.24.1)
