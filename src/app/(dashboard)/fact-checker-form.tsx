@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { useRouter } from "next/navigation";
+
 import { Loader2Icon, SearchIcon } from "lucide-react";
 
 import { checkFact } from "~/actions/server-actions";
@@ -9,6 +11,8 @@ import { Button } from "~/components/ui/button";
 
 export default function FactCheckerForm() {
   const [isLoading, setIsLoading] = useState(false);
+
+  const router = useRouter();
 
   async function handleSubmit(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
@@ -24,9 +28,10 @@ export default function FactCheckerForm() {
     if (result?.error || !result?.data) {
       // TODO: add toast
       console.log("🚀 ~ handleSubmit ~ error:", result.error);
+      return;
     }
 
-    console.log("🚀 ~ handleSubmit ~ result:", result.data);
+    router.push(`/fact/${result.data.id}`);
 
     (ev.target as HTMLFormElement).reset();
   }

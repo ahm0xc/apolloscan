@@ -2,10 +2,12 @@
 
 import { google } from '@ai-sdk/google';
 import { generateObject } from 'ai';
+import { nanoid } from 'nanoid';
 import { YoutubeTranscript } from 'youtube-transcript';
 import * as z from "zod";
-
+import { kv } from '~/lib/kv';
 import { extractYouTubeVideoId, isYoutubeVideoUrl } from "~/lib/utils";
+import { factSchema } from '~/lib/validations';
 
 const CheckFactPayloadSchema = z.object({
     url: z.string().url().refine(
@@ -32,6 +34,7 @@ export async function checkFact(payload: z.infer<typeof CheckFactPayloadSchema>)
     }
 
     try {
+        const factId = nanoid();
 
         const transcript = await YoutubeTranscript.fetchTranscript(videoId);
         const plainTranscript = transcript.map(({ text }) => {
@@ -64,28 +67,44 @@ export async function checkFact(payload: z.infer<typeof CheckFactPayloadSchema>)
             model: google("gemini-2.5-pro-exp-03-25", {
                 useSearchGrounding: true,
             }),
-            schema: z.object({
-                score: z.number().min(1).max(100).describe("Truthfulness score for the video"),
-                claims: z.array(z.object({
-                    claim: z.string().describe("Claim made by the video"),
-                    score: z.number().min(1).max(100).describe("Individual Truthfulness score for the claim"),
-                })).min(1).max(10).describe("Claims made by the video"),
-                summary: z.string().max(1000).describe("Summary of the video"),
-                sources: z.array(z.string()).min(1).max(10).describe("Source urls used to check the truthfulness of the video"),
-            }),
-            prompt
+            schema: factSchema.omit({ id: true, createdAt: true, videoDetails: true }),
+            prompt,
+            maxRetries: 2
         })
 
 
 
         console.log("🟡 aiResponse", aiResponse);
 
+        const fact = {
+            id: factId,
+            createdAt: new Date().toISOString(),
+            videoDetails: {
+                title: videoDetails.title,
+                author: videoDetails.author_name,
+                thumbnail: videoDetails.thumbnail_url,
+                videoId,
+                url: payload.url,
+            },
+            ...aiResponse,
+        }
+
+        const parsedFact = factSchema.parse(fact);
+
+        await kv.set(`fact:${factId}:response`, JSON.stringify(parsedFact));
+
+        // TODO: add cache for video
+        // await kv.set(`cache:video:${videoId}`, JSON.stringify({
+        //     factId,
+        //     createdAt: new Date().toISOString(),
+        // }));
+
         return {
             data: {
+                id: factId,
                 score: aiResponse.score,
                 claims: aiResponse.claims,
                 summary: aiResponse.summary,
-                sources: aiResponse.sources,
             }
         }
 
