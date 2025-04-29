@@ -162,7 +162,7 @@ export default async function FactIDPage({
       <header className="p-8 w-full flex justify-center">
         <FactCheckerForm />
       </header>
-      <div className="grid grid-cols-5">
+      <div className="grid lg:grid-cols-5">
         <div className="col-span-3">
           <section className="grid grid-cols-2 gap-4 p-8">
             <div className="flex flex-col gap-2">
@@ -254,7 +254,7 @@ export default async function FactIDPage({
             </div>
           </section>
         </div>
-        <div className="col-span-2 p-4">
+        <div className="col-span-2 p-4 mx-auto">
           <AnalysisSidebar fact={fact} />
         </div>
       </div>
