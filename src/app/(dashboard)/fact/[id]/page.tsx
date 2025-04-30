@@ -15,11 +15,11 @@ function getScoreCategory(score: number) {
 }
 
 function getScoreColor(score: number) {
-  if (score >= 80) return "green";
-  if (score >= 60) return "green";
-  if (score >= 40) return "yellow";
-  if (score >= 20) return "orange";
-  return "red";
+  if (score >= 80) return "#22c55e"; // green
+  if (score >= 60) return "#22c55e"; // green
+  if (score >= 40) return "#eab308"; // yellow
+  if (score >= 20) return "#f97316"; // orange
+  return "#ef4444"; // red
 }
 
 function CircularProgress({
@@ -63,7 +63,8 @@ function CircularProgress({
           />
           {/* Progress circle */}
           <circle
-            className={`fill-none stroke-${color}-400`}
+            className="fill-none"
+            stroke={color}
             strokeWidth={config.strokeWidth}
             strokeLinecap="round"
             cx="50"
@@ -78,12 +79,17 @@ function CircularProgress({
         {showLabel && (
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
             <div
-              className={`inline-block px-3 py-0.5 rounded-full text-xs mb-3 bg-${color}-50 text-${color}-700`}
+              className="inline-block px-3 py-0.5 rounded-full text-xs mb-3"
+              style={{
+                backgroundColor: `${color}20`,
+                color: color,
+              }}
             >
               {category}
             </div>
             <span
-              className={`${config.fontSize} font-bold mb-1 text-${color}-600`}
+              className={`${config.fontSize} font-bold mb-1`}
+              style={{ color: color }}
             >
               {score}
             </span>
@@ -117,7 +123,8 @@ function CircularProgress({
             r={config.radius}
           />
           <circle
-            className={`fill-none stroke-${color}-400`}
+            className="fill-none"
+            stroke={color}
             strokeWidth={config.strokeWidth}
             strokeLinecap="round"
             cx="50"
@@ -130,7 +137,10 @@ function CircularProgress({
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className={`${config.fontSize} font-medium text-${color}-600`}>
+          <span
+            className={`${config.fontSize} font-medium`}
+            style={{ color: color }}
+          >
             {score}
           </span>
         </div>
