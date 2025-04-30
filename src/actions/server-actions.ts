@@ -61,7 +61,6 @@ export async function checkFact(payload: z.infer<typeof CheckFactPayloadSchema>)
          </video>
          `
 
-        console.log("🟡 prompt", prompt);
 
         const { object: aiResponse } = await generateObject({
             model: google("gemini-2.5-pro-exp-03-25", {
@@ -71,10 +70,6 @@ export async function checkFact(payload: z.infer<typeof CheckFactPayloadSchema>)
             prompt,
             maxRetries: 2
         })
-
-
-
-        console.log("🟡 aiResponse", aiResponse);
 
         const fact = {
             id: factId,
