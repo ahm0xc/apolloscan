@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { useRouter } from "next/navigation";
 
+import { useAuth } from "@clerk/nextjs";
 import { Loader2Icon, SearchIcon } from "lucide-react";
 
 import { checkFact } from "~/actions/server-actions";
@@ -18,9 +19,15 @@ export default function FactCheckerForm({ className }: FactCheckerFormProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
+  const { isSignedIn } = useAuth();
 
   async function handleSubmit(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
+    if (!isSignedIn) {
+      router.push("/sign-in?message=Please sign in to continue");
+      return;
+    }
+
     const formData = new FormData(ev.currentTarget);
 
     const payload = {
