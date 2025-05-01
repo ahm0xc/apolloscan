@@ -1,5 +1,7 @@
 "use server";
 
+import { revalidateTag, unstable_cache } from "next/cache";
+
 import { google } from "@ai-sdk/google";
 import { auth } from "@clerk/nextjs/server";
 import { generateObject } from "ai";
@@ -9,7 +11,7 @@ import * as z from "zod";
 
 import { kv } from "~/lib/kv";
 import { extractYouTubeVideoId, isYoutubeVideoUrl } from "~/lib/utils";
-import { factSchema } from "~/lib/validations";
+import { Fact, factSchema } from "~/lib/validations";
 
 const CheckFactPayloadSchema = z.object({
   url: z
@@ -109,6 +111,8 @@ export async function checkFact(
 
     await kv.set(`fact:${userId}:${factId}`, JSON.stringify(parsedFact));
 
+    revalidateTag("facts");
+
     // TODO: add cache for video
     // await kv.set(`cache:video:${videoId}`, JSON.stringify({
     //     factId,
@@ -130,3 +134,34 @@ export async function checkFact(
     };
   }
 }
+
+export const getFacts = unstable_cache(
+  async (
+    userId: string
+  ): Promise<{
+    data: Fact[];
+    error: string | null;
+  }> => {
+    try {
+      const facts = await kv.getByPattern(`fact:${userId}:*`);
+      const parsedFacts = facts.map((fact) => factSchema.parse(fact));
+      const sortedFacts = parsedFacts.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+
+      return {
+        data: sortedFacts,
+        error: null,
+      };
+    } catch (error) {
+      console.error("🔴 error", error);
+      return {
+        data: [],
+        error: "Failed to get facts",
+      };
+    }
+  },
+  ["facts"],
+  { tags: ["facts"] }
+);

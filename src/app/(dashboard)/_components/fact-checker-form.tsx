@@ -73,7 +73,6 @@ export default function FactCheckerForm({ className }: FactCheckerFormProps) {
     }
     setTimeout(() => {
       if (hasSearchParam("autoCheck") && formRef.current) {
-        console.log("🚀 ~ React.useEffect ~ getSearchParams:", "autoCheck");
         const event = new Event("submit", { bubbles: true, cancelable: true });
         formRef.current.dispatchEvent(event);
       }

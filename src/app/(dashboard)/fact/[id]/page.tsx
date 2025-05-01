@@ -167,8 +167,6 @@ export default async function FactIDPage({
 
   const dbFact = (await kv.get(`fact:${userId}:${id}`)) as string | null;
 
-  console.log("🚀 ~ dbFact:", dbFact);
-
   if (!dbFact) {
     redirect("/");
   }
