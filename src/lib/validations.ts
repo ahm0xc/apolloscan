@@ -29,6 +29,9 @@ export const factSchema = z.object({
     .max(20)
     .describe("Claims made by the video"),
   summary: z.string().max(1000).describe("Summary of the video"),
+  sources: z
+    .array(z.string())
+    .describe("Links of the sources used by the video"),
   createdAt: z.string(),
 });
 

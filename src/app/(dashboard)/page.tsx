@@ -78,7 +78,7 @@ function FloatingImage({
           alt=""
           width={300}
           height={300}
-          className="rounded-[calc(24px-8px)] w-[200px] sm:w-[260px] md:w-[320px]"
+          className="rounded-[calc(24px-8px)] w-[200px] sm:w-[260px] md:w-[320px] aspect-video h-auto object-cover"
         />
         {percentage && (
           <div className="absolute top-2 -right-4 bg-red-50 border border-red-100 text-red-800 font-semibold text-xs px-2 py-1 rounded-full">
