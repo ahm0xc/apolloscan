@@ -10,11 +10,13 @@ import { cn } from "~/lib/utils";
 
 import HistorySearchBar from "./history-search-bar";
 
-export default function HistoryPage({
+export default async function HistoryPage({
   searchParams,
 }: {
-  searchParams: { q?: string };
+  searchParams: Promise<{ q?: string }>;
 }) {
+  const { q } = await searchParams;
+
   return (
     <div className="p-8">
       <div className="flex items-center justify-between">
@@ -26,7 +28,7 @@ export default function HistoryPage({
         </div>
         <HistorySearchBar />
       </div>
-      <HistorySection className="mt-8" searchQuery={searchParams.q} />
+      <HistorySection className="mt-8" searchQuery={q} />
     </div>
   );
 }
