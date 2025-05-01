@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useAuth, useUser } from "@clerk/nextjs";
 import {
   BadgeCheck,
-  Bell,
   ChevronsUpDown,
   CreditCard,
   LogOut,
@@ -116,10 +115,6 @@ export default function NavUser() {
                 <DropdownMenuItem>
                   <CreditCard />
                   Billing
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Bell />
-                  Notifications
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />

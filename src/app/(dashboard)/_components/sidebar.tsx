@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  BarChartIcon,
-  CreditCardIcon,
-  HistoryIcon,
-  HomeIcon,
-  SettingsIcon,
-} from "lucide-react";
+import { CreditCardIcon, HistoryIcon, HomeIcon, UserIcon } from "lucide-react";
 
 import { Separator } from "~/components/ui/separator";
 import {
@@ -23,14 +17,9 @@ import NavUser from "./user-nav";
 
 const mainNavLinks = [
   {
-    name: "Dashboard",
+    name: "Home",
     url: "/",
     icon: HomeIcon,
-  },
-  {
-    name: "Analytics",
-    url: "/analytics",
-    icon: BarChartIcon,
   },
   {
     name: "History",
@@ -39,16 +28,16 @@ const mainNavLinks = [
   },
 ];
 
-const secondaryNavLinks = [
+const managementNavLinks = [
   {
     name: "Billing",
     url: "/billing",
     icon: CreditCardIcon,
   },
   {
-    name: "Settings",
-    url: "/settings",
-    icon: SettingsIcon,
+    name: "Account",
+    url: "/account",
+    icon: UserIcon,
   },
 ];
 
@@ -64,8 +53,9 @@ export default function DashboardSidebar({
       <SidebarContent>
         <SidebarNav title="Main" links={mainNavLinks} />
         <Separator />
-        <SidebarNav title="Secondary" links={secondaryNavLinks} />
+        <SidebarNav title="Management" links={managementNavLinks} />
       </SidebarContent>
+      <Separator />
       <SidebarFooter>
         <NavUser />
       </SidebarFooter>
