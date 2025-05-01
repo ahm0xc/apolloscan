@@ -6,10 +6,15 @@ import { Search } from "lucide-react";
 
 import { getFacts } from "~/actions/server-actions";
 import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
 import { cn } from "~/lib/utils";
 
-export default function HistoryPage() {
+import HistorySearchBar from "./history-search-bar";
+
+export default function HistoryPage({
+  searchParams,
+}: {
+  searchParams: { q?: string };
+}) {
   return (
     <div className="p-8">
       <div className="flex items-center justify-between">
@@ -19,20 +24,20 @@ export default function HistoryPage() {
             View your past fact checks
           </p>
         </div>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search fact checks..."
-            className="w-full pl-9 md:w-[300px]"
-          />
-        </div>
+        <HistorySearchBar />
       </div>
-      <HistorySection className="mt-8" />
+      <HistorySection className="mt-8" searchQuery={searchParams.q} />
     </div>
   );
 }
 
-async function HistorySection({ className }: { className?: string }) {
+async function HistorySection({
+  className,
+  searchQuery,
+}: {
+  className?: string;
+  searchQuery?: string;
+}) {
   const { userId } = await auth();
 
   if (!userId) {
@@ -45,13 +50,39 @@ async function HistorySection({ className }: { className?: string }) {
     return <div>{error}</div>;
   }
 
+  // Filter facts based on search query if provided
+  const filteredFacts = searchQuery
+    ? facts.filter(
+        (fact) =>
+          fact.videoDetails.title
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          fact.summary.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : facts;
+
   return (
     <section className={cn("space-y-6", className)}>
-      {facts.length === 0 ? (
-        <EmptyState />
+      {filteredFacts.length === 0 ? (
+        searchQuery ? (
+          <div className="flex h-[60vh] flex-col items-center justify-center rounded-xl border border-dashed bg-gradient-to-b from-muted/20 to-muted/50 py-12">
+            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-muted to-muted/70 shadow-inner">
+              <Search className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <h3 className="mt-4 text-lg font-medium">
+              No matching fact checks
+            </h3>
+            <p className="mt-2 max-w-md text-center text-sm text-muted-foreground">
+              No fact checks match your search query. Try different search
+              terms.
+            </p>
+          </div>
+        ) : (
+          <EmptyState />
+        )
       ) : (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {facts.map((fact) => (
+          {filteredFacts.map((fact) => (
             <FactCard key={fact.id} fact={fact} />
           ))}
         </div>
