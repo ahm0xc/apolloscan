@@ -264,7 +264,7 @@ export default async function FactIDPage({
             </div>
           </section>
         </div>
-        <div className="col-span-2 p-4 mx-auto">
+        <div className="col-span-2 p-4 w-full">
           <AnalysisSidebar fact={fact} />
         </div>
       </div>

@@ -31,7 +31,7 @@ export const factSchema = z.object({
   summary: z.string().max(1000).describe("Summary of the video"),
   sources: z
     .array(z.string())
-    .describe("Links of the sources used by the video"),
+    .describe("Links of the sources used by the video. Only give working links."),
   createdAt: z.string(),
 });
 

@@ -17,6 +17,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@ahm0xc/utils": "^0.5.1",
     "@ai-sdk/google": "^1.2.14",
     "@clerk/nextjs": "^6.18.1",
     "@radix-ui/react-avatar": "^1.1.7",
