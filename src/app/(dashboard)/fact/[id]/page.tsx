@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
 
+import { auth } from "@clerk/nextjs/server";
+
 import { kv } from "~/lib/kv";
 import { factSchema } from "~/lib/validations";
 
@@ -157,7 +159,13 @@ export default async function FactIDPage({
 }) {
   const { id } = await params;
 
-  const dbFact = (await kv.get(`fact:${id}:response`)) as string | null;
+  const { userId } = await auth();
+
+  if (!userId) {
+    redirect("/");
+  }
+
+  const dbFact = (await kv.get(`fact:${userId}:${id}`)) as string | null;
 
   console.log("🚀 ~ dbFact:", dbFact);
 

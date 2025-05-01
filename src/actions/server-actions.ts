@@ -1,6 +1,7 @@
 "use server";
 
 import { google } from "@ai-sdk/google";
+import { auth } from "@clerk/nextjs/server";
 import { generateObject } from "ai";
 import { nanoid } from "nanoid";
 import { YoutubeTranscript } from "youtube-transcript";
@@ -22,6 +23,14 @@ const CheckFactPayloadSchema = z.object({
 export async function checkFact(
   payload: z.infer<typeof CheckFactPayloadSchema>
 ) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    return {
+      error: "Unauthorized",
+    };
+  }
+
   const result = CheckFactPayloadSchema.safeParse(payload);
   if (!result.success) {
     return {
@@ -98,7 +107,7 @@ export async function checkFact(
 
     const parsedFact = factSchema.parse(fact);
 
-    await kv.set(`fact:${factId}:response`, JSON.stringify(parsedFact));
+    await kv.set(`fact:${userId}:${factId}`, JSON.stringify(parsedFact));
 
     // TODO: add cache for video
     // await kv.set(`cache:video:${videoId}`, JSON.stringify({
