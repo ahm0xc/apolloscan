@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { useAuth } from "@clerk/nextjs";
+import axios from "axios";
 import { Loader2Icon, SearchIcon } from "lucide-react";
 
 import { checkFact } from "~/actions/server-actions";
@@ -19,6 +20,24 @@ function getSearchParams(key: string) {
 function hasSearchParam(key: string) {
   const url = new URL(window.location.href);
   return url.searchParams.has(key);
+}
+
+function removeSearchParam(key: string) {
+  const url = new URL(window.location.href);
+  url.searchParams.delete(key);
+  window.history.replaceState({}, "", url.toString());
+}
+
+async function getTranscript(videoId: string) {
+  const { data: transcript } = await axios.get<
+    {
+      text: string;
+      duration: number;
+      offset: number;
+      lang: string;
+    }[]
+  >(`/api/transcript?videoId=${videoId}`);
+  return transcript;
 }
 
 interface FactCheckerFormProps {
@@ -39,6 +58,7 @@ export default function FactCheckerForm({ className }: FactCheckerFormProps) {
 
     const payload = {
       url: formData.get("url") as string,
+      transcript: "",
     };
 
     if (!payload.url) {
@@ -54,6 +74,22 @@ export default function FactCheckerForm({ className }: FactCheckerFormProps) {
     }
 
     setIsLoading(true);
+    const transcript = await getTranscript(payload.url);
+    console.log("🚀 ~ handleSubmit ~ transcript:", transcript);
+    const plainTranscript = transcript
+      .map(({ text }) => {
+        return text
+          .replace(/&amp;/g, "&")
+          .replace(/&lt;/g, "<")
+          .replace(/&gt;/g, ">")
+          .replace(/&quot;/g, '"')
+          .replace(/&#39;/g, "'")
+          .replace(/&nbsp;/g, " ");
+      })
+      .join(" ");
+
+    payload.transcript = plainTranscript;
+
     const result = await checkFact(payload);
     setIsLoading(false);
     if (result?.error || !result?.data) {
@@ -70,11 +106,13 @@ export default function FactCheckerForm({ className }: FactCheckerFormProps) {
   React.useEffect(() => {
     if (hasSearchParam("videoUrl") && urlInputRef.current) {
       urlInputRef.current.value = getSearchParams("videoUrl") ?? "";
+      removeSearchParam("videoUrl");
     }
     setTimeout(() => {
       if (hasSearchParam("autoCheck") && formRef.current) {
         const event = new Event("submit", { bubbles: true, cancelable: true });
         formRef.current.dispatchEvent(event);
+        removeSearchParam("autoCheck");
       }
     }, 500);
   }, []);

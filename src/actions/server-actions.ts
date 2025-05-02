@@ -6,7 +6,6 @@ import { google } from "@ai-sdk/google";
 import { auth } from "@clerk/nextjs/server";
 import { generateObject } from "ai";
 import { nanoid } from "nanoid";
-import { fetchTranscript } from 'youtube-transcript-plus';
 import * as z from "zod";
 
 import { kv } from "~/lib/kv";
@@ -20,6 +19,7 @@ const CheckFactPayloadSchema = z.object({
     .refine((url) => isYoutubeVideoUrl(url), {
       message: "URL must be a valid YouTube video URL",
     }),
+  transcript: z.string(),
 });
 
 export async function checkFact(
@@ -52,22 +52,6 @@ export async function checkFact(
   try {
     const factId = nanoid();
 
-    const transcript = await fetchTranscript(videoId, {
-      userAgent:
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-    });
-    const plainTranscript = transcript
-      .map(({ text }) => {
-        return text
-          .replace(/&amp;/g, "&")
-          .replace(/&lt;/g, "<")
-          .replace(/&gt;/g, ">")
-          .replace(/&quot;/g, '"')
-          .replace(/&#39;/g, "'")
-          .replace(/&nbsp;/g, " ");
-      })
-      .join(" ");
-
     const videoDetailsRes = await fetch(
       `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`
     );
@@ -80,7 +64,7 @@ export async function checkFact(
          <video>
             <title>${videoDetails.title}</title>
             <author>${videoDetails.author_name}</author>
-            <transcript>${plainTranscript}</transcript>
+            <transcript>${payload.transcript}</transcript>
          </video>
          `;
 
