@@ -6,7 +6,7 @@ import { google } from "@ai-sdk/google";
 import { auth } from "@clerk/nextjs/server";
 import { generateObject } from "ai";
 import { nanoid } from "nanoid";
-import { YoutubeTranscript } from "youtube-transcript";
+import { fetchTranscript } from 'youtube-transcript-plus';
 import * as z from "zod";
 
 import { kv } from "~/lib/kv";
@@ -52,7 +52,7 @@ export async function checkFact(
   try {
     const factId = nanoid();
 
-    const transcript = await YoutubeTranscript.fetchTranscript(videoId);
+    const transcript = await fetchTranscript(videoId);
     const plainTranscript = transcript
       .map(({ text }) => {
         return text

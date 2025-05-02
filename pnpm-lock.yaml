@@ -111,6 +111,9 @@ importers:
       youtube-transcript:
         specifier: ^1.2.1
         version: 1.2.1
+      youtube-transcript-plus:
+        specifier: ^1.0.4
+        version: 1.0.4
       zod:
         specifier: ^3.24.1
         version: 3.24.1
@@ -3009,6 +3012,10 @@ packages:
   yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
+
+  youtube-transcript-plus@1.0.4:
+    resolution: {integrity: sha512-FtlCH2tYLrEmJWLQYCxwsvI0X7iv3tsLgJjEqOboHC4pMM9o1G6URbSegERDsnDWCkUtTFVd+khkvX9ohLLQpg==}
+    engines: {node: '>=18.0.0'}
 
   youtube-transcript@1.2.1:
     resolution: {integrity: sha512-TvEGkBaajKw+B6y91ziLuBLsa5cawgowou+Bk0ciGpjELDfAzSzTGXaZmeSSkUeknCPpEr/WGApOHDwV7V+Y9Q==}
@@ -6076,6 +6083,8 @@ snapshots:
   yaml@2.7.0: {}
 
   yocto-queue@0.1.0: {}
+
+  youtube-transcript-plus@1.0.4: {}
 
   youtube-transcript@1.2.1: {}
 
