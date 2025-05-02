@@ -32,9 +32,8 @@ async function getTranscript(videoId: string) {
   const { data: transcript } = await axios.get<
     {
       text: string;
+      start: number;
       duration: number;
-      offset: number;
-      lang: string;
     }[]
   >(`/api/transcript?videoId=${videoId}`);
   return transcript;
@@ -75,7 +74,6 @@ export default function FactCheckerForm({ className }: FactCheckerFormProps) {
 
     setIsLoading(true);
     const transcript = await getTranscript(payload.url);
-    console.log("🚀 ~ handleSubmit ~ transcript:", transcript);
     const plainTranscript = transcript
       .map(({ text }) => {
         return text
@@ -87,6 +85,13 @@ export default function FactCheckerForm({ className }: FactCheckerFormProps) {
           .replace(/&nbsp;/g, " ");
       })
       .join(" ");
+
+    if (plainTranscript.trim().length === 0) {
+      // TODO: add toast
+      console.log("🚀 ~ handleSubmit ~ error:", "Transcript is empty");
+      alert("Transcript is empty");
+      return;
+    }
 
     payload.transcript = plainTranscript;
 
