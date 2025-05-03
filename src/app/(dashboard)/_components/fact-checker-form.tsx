@@ -57,7 +57,6 @@ export default function FactCheckerForm({ className }: FactCheckerFormProps) {
 
     const payload = {
       url: formData.get("url") as string,
-      transcript: "",
     };
 
     if (!payload.url) {
@@ -73,27 +72,6 @@ export default function FactCheckerForm({ className }: FactCheckerFormProps) {
     }
 
     setIsLoading(true);
-    const transcript = await getTranscript(payload.url);
-    const plainTranscript = transcript
-      .map(({ text }) => {
-        return text
-          .replace(/&amp;/g, "&")
-          .replace(/&lt;/g, "<")
-          .replace(/&gt;/g, ">")
-          .replace(/&quot;/g, '"')
-          .replace(/&#39;/g, "'")
-          .replace(/&nbsp;/g, " ");
-      })
-      .join(" ");
-
-    if (plainTranscript.trim().length === 0) {
-      // TODO: add toast
-      console.log("🚀 ~ handleSubmit ~ error:", "Transcript is empty");
-      alert("Transcript is empty");
-      return;
-    }
-
-    payload.transcript = plainTranscript;
 
     const result = await checkFact(payload);
     setIsLoading(false);

@@ -6,11 +6,62 @@ import { google } from "@ai-sdk/google";
 import { auth } from "@clerk/nextjs/server";
 import { generateObject } from "ai";
 import { nanoid } from "nanoid";
+import Innertube from "youtubei.js/web";
 import * as z from "zod";
 
 import { kv } from "~/lib/kv";
 import { extractYouTubeVideoId, isYoutubeVideoUrl } from "~/lib/utils";
 import { Fact, factSchema } from "~/lib/validations";
+
+export async function getTranscript(urlOrId: string) {
+  let videoId = urlOrId;
+  if (isYoutubeVideoUrl(urlOrId)) {
+    videoId = extractYouTubeVideoId(urlOrId) ?? "";
+  }
+
+  const youtube = await Innertube.create({
+    lang: "en",
+    location: "US",
+    retrieve_player: false,
+  });
+  const info = await youtube.getInfo(videoId);
+  const transcriptData = await info.getTranscript();
+  const segments = transcriptData?.transcript?.content?.body?.initial_segments;
+  const transcript = Array.isArray(segments)
+    ? segments
+        .filter(
+          (segment: any) =>
+            segment &&
+            segment.snippet &&
+            typeof segment.snippet.text === "string"
+        )
+        .map((segment: any) => ({
+          text: segment.snippet.text,
+        }))
+    : [];
+
+  if (transcript.length === 0) {
+    return {
+      error: "No transcript found",
+    };
+  }
+
+  const plainTranscript = transcript
+    .map(({ text }) => text)
+    .join(" ")
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, " ");
+
+  if (plainTranscript.trim().length === 0) {
+    return {
+      error: "Transcript is empty",
+    };
+  }
+
+  return {
+    data: plainTranscript,
+  };
+}
 
 const CheckFactPayloadSchema = z.object({
   url: z
@@ -19,7 +70,6 @@ const CheckFactPayloadSchema = z.object({
     .refine((url) => isYoutubeVideoUrl(url), {
       message: "URL must be a valid YouTube video URL",
     }),
-  transcript: z.string(),
 });
 
 export async function checkFact(
@@ -52,6 +102,14 @@ export async function checkFact(
   try {
     const factId = nanoid();
 
+    const transcriptRes = await getTranscript(payload.url);
+
+    if (transcriptRes.error) {
+      return {
+        error: transcriptRes.error,
+      };
+    }
+
     const videoDetailsRes = await fetch(
       `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`
     );
@@ -64,7 +122,7 @@ export async function checkFact(
          <video>
             <title>${videoDetails.title}</title>
             <author>${videoDetails.author_name}</author>
-            <transcript>${payload.transcript}</transcript>
+            <transcript>${transcriptRes.data}</transcript>
          </video>
          `;
 

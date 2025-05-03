@@ -114,12 +114,12 @@ importers:
       tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.17)
-      youtube-transcript-plus:
-        specifier: ^1.0.4
-        version: 1.0.4
       youtube-transcript-ts:
         specifier: ^1.3.0
         version: 1.3.0
+      youtubei.js:
+        specifier: ^13.4.0
+        version: 13.4.0
       zod:
         specifier: ^3.24.1
         version: 3.24.1
@@ -255,6 +255,9 @@ packages:
     resolution: {integrity: sha512-+EzkxvLNfiUeKMgy/3luqfsCWFRXLb7U6wNQTk60tovuckwB15B191tJWvpp4HjiQWdJkCxO3Wbvc6jlk3Xb2Q==}
     engines: {node: '>=6.9.0'}
 
+  '@bufbuild/protobuf@2.2.5':
+    resolution: {integrity: sha512-/g5EzJifw5GF8aren8wZ/G5oMuPoGeS6MQD3ca8ddcvdXR5UELUfdTZITCGNhNXynY/AYl3Z4plmxdj/tRl/hQ==}
+
   '@clerk/backend@1.30.1':
     resolution: {integrity: sha512-DjE52hChJJ8YtgAFuCHnoS4MVOmReOaDO6T60djY6Mhn1zRm2U0235F+Ey/16i87FGC4SwvIjBp40wDLT4DAQA==}
     engines: {node: '>=18.17.0'}
@@ -337,6 +340,10 @@ packages:
   '@eslint/plugin-kit@0.2.7':
     resolution: {integrity: sha512-JubJ5B2pJ4k4yGxaNLdbjrnk9d/iDz6/q8wOilpIowd6PJPgaxCuHBnBszq7Ce2TyMrywm5r4PnKm6V3iiZF+g==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@fastify/busboy@2.1.1':
+    resolution: {integrity: sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==}
+    engines: {node: '>=14'}
 
   '@floating-ui/core@1.6.9':
     resolution: {integrity: sha512-uMXCuQ3BItDUbAMhIXw7UPXRfAlOAvZzdK9BWpE60MCn+Svt3aLn9jsPTi/WNGlRUu2uI0v5S7JiIUsbsvh3fw==}
@@ -2281,6 +2288,9 @@ packages:
   javascript-natural-sort@0.7.1:
     resolution: {integrity: sha512-nO6jcEfZWQXDhOiBtG2KvKyEptz7RVbpGP4vTD2hLBdmNQSsCiicO2Ioinv6UI4y9ukqnBpy+XZ9H6uLNgJTlw==}
 
+  jintr@3.3.1:
+    resolution: {integrity: sha512-nnOzyhf0SLpbWuZ270Omwbj5LcXUkTcZkVnK8/veJXtSZOiATM5gMZMdmzN75FmTyj+NVgrGaPdH12zIJ24oIA==}
+
   jiti@1.21.7:
     resolution: {integrity: sha512-/imKNG4EbWNrVjoNC/1H5/9GFy+tqjGBHCaSsN+P2RnPqjsLmv6UD3Ej+Kj8nBWaRAwyk7kK5ZUc+OEatnTR3A==}
     hasBin: true
@@ -3074,6 +3084,10 @@ packages:
   undici-types@6.19.8:
     resolution: {integrity: sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==}
 
+  undici@5.29.0:
+    resolution: {integrity: sha512-raqeBD6NQK4SkWhQzeYKd1KmIG6dllBOTt55Rmkt4HtI9mwdWtJljnrXjAFUBLTSN67HWrOIZ3EPF4kjUw80Bg==}
+    engines: {node: '>=14.0'}
+
   uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
 
@@ -3160,12 +3174,11 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
-  youtube-transcript-plus@1.0.4:
-    resolution: {integrity: sha512-FtlCH2tYLrEmJWLQYCxwsvI0X7iv3tsLgJjEqOboHC4pMM9o1G6URbSegERDsnDWCkUtTFVd+khkvX9ohLLQpg==}
-    engines: {node: '>=18.0.0'}
-
   youtube-transcript-ts@1.3.0:
     resolution: {integrity: sha512-dNK79qsCAmVC9O+zdk3srL7X+rdVZY1RmhSuvtpQt9lP6max5DSxVCiyDDD00TyT7yRCbsU/xHrwU/+WmF7w6w==}
+
+  youtubei.js@13.4.0:
+    resolution: {integrity: sha512-+fmIZU/dWAjsROONrASy1REwVpy6umAPVuoNLr/4iNmZXl84LyBef0n3hrd1Vn9035EuINToGyQcBmifwUEemA==}
 
   zod-to-json-schema@3.24.5:
     resolution: {integrity: sha512-/AuWwMP+YqiPbsJx5D6TfgRTc4kTLjsh5SOcd4bLsfUg2RcEXrFMJl1DGgdHy2aCfsIA/cr/1JM0xcB2GZji8g==}
@@ -3277,6 +3290,8 @@ snapshots:
       '@babel/helper-validator-identifier': 7.27.1
     optional: true
 
+  '@bufbuild/protobuf@2.2.5': {}
+
   '@clerk/backend@1.30.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
     dependencies:
       '@clerk/shared': 3.7.5(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -3378,6 +3393,8 @@ snapshots:
     dependencies:
       '@eslint/core': 0.12.0
       levn: 0.4.1
+
+  '@fastify/busboy@2.1.1': {}
 
   '@floating-ui/core@1.6.9':
     dependencies:
@@ -5484,6 +5501,10 @@ snapshots:
 
   javascript-natural-sort@0.7.1: {}
 
+  jintr@3.3.1:
+    dependencies:
+      acorn: 8.14.0
+
   jiti@1.21.7: {}
 
   js-cookie@3.0.5: {}
@@ -6297,6 +6318,10 @@ snapshots:
 
   undici-types@6.19.8: {}
 
+  undici@5.29.0:
+    dependencies:
+      '@fastify/busboy': 2.1.1
+
   uri-js@4.4.1:
     dependencies:
       punycode: 2.3.1
@@ -6395,8 +6420,6 @@ snapshots:
 
   yocto-queue@0.1.0: {}
 
-  youtube-transcript-plus@1.0.4: {}
-
   youtube-transcript-ts@1.3.0:
     dependencies:
       axios: 1.9.0
@@ -6406,6 +6429,13 @@ snapshots:
     transitivePeerDependencies:
       - debug
       - supports-color
+
+  youtubei.js@13.4.0:
+    dependencies:
+      '@bufbuild/protobuf': 2.2.5
+      jintr: 3.3.1
+      tslib: 2.8.1
+      undici: 5.29.0
 
   zod-to-json-schema@3.24.5(zod@3.24.1):
     dependencies:
