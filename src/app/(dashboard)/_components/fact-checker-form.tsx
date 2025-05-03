@@ -41,8 +41,6 @@ export default function FactCheckerForm({ className }: FactCheckerFormProps) {
   const formRef = React.useRef<HTMLFormElement>(null);
   const urlInputRef = React.useRef<HTMLInputElement>(null);
 
-  // const [runDetails, setRunDetails] = React.useState<RunDetails | null>(null);
-
   const router = useRouter();
   const { isSignedIn } = useAuth();
 
@@ -72,10 +70,6 @@ export default function FactCheckerForm({ className }: FactCheckerFormProps) {
       const parsedFact = factSchema.parse(fact);
 
       router.push(`/fact/${parsedFact.id}`);
-      // const response = await fetch(`/api/check-fact?url=${url}`);
-      // const handle = await response.json();
-
-      // setRunDetails(handle);
     } catch (error) {
       // TODO: add toast
       console.log("🚀 ~ handleSubmit ~ error:", error);
@@ -85,18 +79,6 @@ export default function FactCheckerForm({ className }: FactCheckerFormProps) {
 
     (ev.target as HTMLFormElement).reset();
   }
-
-  // function handleFactComplete(fact: Fact) {
-  //   console.log("🚀 ~ handleFactComplete ~ fact:", fact);
-  //   setRunDetails(null);
-  //   setIsLoading(false);
-  //   router.push(`/fact/${fact.id}`);
-  // }
-
-  // function handleFactError(error: any) {
-  //   console.log("🚀 ~ handleFactError ~ error:", error);
-  //   setRunDetails(null);
-  // }
 
   React.useEffect(() => {
     if (hasSearchParam("videoUrl") && urlInputRef.current) {
@@ -113,73 +95,32 @@ export default function FactCheckerForm({ className }: FactCheckerFormProps) {
   }, []);
 
   return (
-    <React.Fragment>
-      {/* {runDetails && (
-        <FactRunHandler
-          runDetails={runDetails}
-          onComplete={handleFactComplete}
-          onError={handleFactError}
-        />
-      )} */}
-      <form
-        onSubmit={handleSubmit}
-        ref={formRef}
-        className={cn(
-          "h-12 rounded-full flex items-center gap-2 border pr-1 w-[35vw] min-w-[350px] bg-accent",
-          className
-        )}
+    <form
+      onSubmit={handleSubmit}
+      ref={formRef}
+      className={cn(
+        "h-12 rounded-full flex items-center gap-2 border pr-1 w-[35vw] min-w-[350px] bg-accent",
+        className
+      )}
+    >
+      <input
+        type="url"
+        name="url"
+        ref={urlInputRef}
+        placeholder="Paste a video link here"
+        className="bg-transparent border-none outline-none flex-1 px-4 h-full rounded-full"
+      />
+      <Button
+        size="icon"
+        className="rounded-full bg-pink-600"
+        disabled={isLoading}
       >
-        <input
-          type="url"
-          name="url"
-          ref={urlInputRef}
-          placeholder="Paste a video link here"
-          className="bg-transparent border-none outline-none flex-1 px-4 h-full rounded-full"
-        />
-        <Button
-          size="icon"
-          className="rounded-full bg-pink-600"
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <Loader2Icon className="w-4 h-4 animate-spin" />
-          ) : (
-            <SearchIcon className="w-4 h-4" />
-          )}
-        </Button>
-      </form>
-    </React.Fragment>
+        {isLoading ? (
+          <Loader2Icon className="w-4 h-4 animate-spin" />
+        ) : (
+          <SearchIcon className="w-4 h-4" />
+        )}
+      </Button>
+    </form>
   );
 }
-
-// function FactRunHandler({
-//   runDetails,
-//   onComplete,
-//   onError,
-// }: {
-//   runDetails: RunDetails;
-//   onComplete: (fact: Fact) => void;
-//   onError: (error: any) => void;
-// }) {
-//   const hasTriggerOnCompleted = React.useRef(false);
-//   const hasTriggerOnError = React.useRef(false);
-
-//   const { run, error } = useRealtimeRun(runDetails.id, {
-//     accessToken: runDetails.publicAccessToken,
-//   });
-
-//   console.log("🚀 ~ FactRunHandler ~ run:", run);
-//   console.log("🚀 ~ FactRunHandler ~ error:", error);
-
-//   if (run?.output && !hasTriggerOnCompleted.current) {
-//     onComplete(run.output as Fact);
-//     hasTriggerOnCompleted.current = true;
-//   }
-
-//   if (error && !hasTriggerOnError.current) {
-//     onError(error);
-//     hasTriggerOnError.current = true;
-//   }
-
-//   return null;
-// }
