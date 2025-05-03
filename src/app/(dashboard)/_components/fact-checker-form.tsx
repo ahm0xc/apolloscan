@@ -5,12 +5,12 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { useAuth } from "@clerk/nextjs";
-import axios from "axios";
+import { useRealtimeRun } from "@trigger.dev/react-hooks";
 import { Loader2Icon, SearchIcon } from "lucide-react";
 
-import { checkFact } from "~/actions/server-actions";
 import { Button } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
+import { Fact } from "~/lib/validations";
 
 function getSearchParams(key: string) {
   const url = new URL(window.location.href);
@@ -28,15 +28,9 @@ function removeSearchParam(key: string) {
   window.history.replaceState({}, "", url.toString());
 }
 
-async function getTranscript(videoId: string) {
-  const { data: transcript } = await axios.get<
-    {
-      text: string;
-      start: number;
-      duration: number;
-    }[]
-  >(`/api/transcript?videoId=${videoId}`);
-  return transcript;
+interface RunDetails {
+  id: string;
+  publicAccessToken: string;
 }
 
 interface FactCheckerFormProps {
@@ -48,6 +42,8 @@ export default function FactCheckerForm({ className }: FactCheckerFormProps) {
   const formRef = React.useRef<HTMLFormElement>(null);
   const urlInputRef = React.useRef<HTMLInputElement>(null);
 
+  const [runDetails, setRunDetails] = React.useState<RunDetails | null>(null);
+
   const router = useRouter();
   const { isSignedIn } = useAuth();
 
@@ -55,11 +51,9 @@ export default function FactCheckerForm({ className }: FactCheckerFormProps) {
     ev.preventDefault();
     const formData = new FormData(ev.currentTarget);
 
-    const payload = {
-      url: formData.get("url") as string,
-    };
+    const url = formData.get("url") as string;
 
-    if (!payload.url) {
+    if (!url) {
       // TODO: add toast
       console.log("🚀 ~ handleSubmit ~ error:", "URL is required");
       alert("URL is required");
@@ -67,23 +61,36 @@ export default function FactCheckerForm({ className }: FactCheckerFormProps) {
     }
 
     if (!isSignedIn) {
-      router.push(`/sign-in?videoUrl=${payload.url}`);
+      router.push(`/sign-in?videoUrl=${url}`);
       return;
     }
 
-    setIsLoading(true);
+    setRunDetails(null);
+    try {
+      setIsLoading(true);
+      const response = await fetch(`/api/check-fact?url=${url}`);
+      const handle = await response.json();
 
-    const result = await checkFact(payload);
-    setIsLoading(false);
-    if (result?.error || !result?.data) {
+      setRunDetails(handle);
+    } catch (error) {
       // TODO: add toast
-      console.log("🚀 ~ handleSubmit ~ error:", result.error);
-      return;
+      console.log("🚀 ~ handleSubmit ~ error:", error);
+      setIsLoading(false);
     }
-
-    router.push(`/fact/${result.data.id}`);
 
     (ev.target as HTMLFormElement).reset();
+  }
+
+  function handleFactComplete(fact: Fact) {
+    console.log("🚀 ~ handleFactComplete ~ fact:", fact);
+    setRunDetails(null);
+    setIsLoading(false);
+    router.push(`/fact/${fact.id}`);
+  }
+
+  function handleFactError(error: any) {
+    console.log("🚀 ~ handleFactError ~ error:", error);
+    setRunDetails(null);
   }
 
   React.useEffect(() => {
@@ -101,32 +108,73 @@ export default function FactCheckerForm({ className }: FactCheckerFormProps) {
   }, []);
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      ref={formRef}
-      className={cn(
-        "h-12 rounded-full flex items-center gap-2 border pr-1 w-[35vw] min-w-[350px] bg-accent",
-        className
+    <React.Fragment>
+      {runDetails && (
+        <FactRunHandler
+          runDetails={runDetails}
+          onComplete={handleFactComplete}
+          onError={handleFactError}
+        />
       )}
-    >
-      <input
-        type="url"
-        name="url"
-        ref={urlInputRef}
-        placeholder="Paste a video link here"
-        className="bg-transparent border-none outline-none flex-1 px-4 h-full rounded-full"
-      />
-      <Button
-        size="icon"
-        className="rounded-full bg-pink-600"
-        disabled={isLoading}
-      >
-        {isLoading ? (
-          <Loader2Icon className="w-4 h-4 animate-spin" />
-        ) : (
-          <SearchIcon className="w-4 h-4" />
+      <form
+        onSubmit={handleSubmit}
+        ref={formRef}
+        className={cn(
+          "h-12 rounded-full flex items-center gap-2 border pr-1 w-[35vw] min-w-[350px] bg-accent",
+          className
         )}
-      </Button>
-    </form>
+      >
+        <input
+          type="url"
+          name="url"
+          ref={urlInputRef}
+          placeholder="Paste a video link here"
+          className="bg-transparent border-none outline-none flex-1 px-4 h-full rounded-full"
+        />
+        <Button
+          size="icon"
+          className="rounded-full bg-pink-600"
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <Loader2Icon className="w-4 h-4 animate-spin" />
+          ) : (
+            <SearchIcon className="w-4 h-4" />
+          )}
+        </Button>
+      </form>
+    </React.Fragment>
   );
+}
+
+function FactRunHandler({
+  runDetails,
+  onComplete,
+  onError,
+}: {
+  runDetails: RunDetails;
+  onComplete: (fact: Fact) => void;
+  onError: (error: any) => void;
+}) {
+  const hasTriggerOnCompleted = React.useRef(false);
+  const hasTriggerOnError = React.useRef(false);
+
+  const { run, error } = useRealtimeRun(runDetails.id, {
+    accessToken: runDetails.publicAccessToken,
+  });
+
+  console.log("🚀 ~ FactRunHandler ~ run:", run);
+  console.log("🚀 ~ FactRunHandler ~ error:", error);
+
+  if (run?.output && !hasTriggerOnCompleted.current) {
+    onComplete(run.output as Fact);
+    hasTriggerOnCompleted.current = true;
+  }
+
+  if (error && !hasTriggerOnError.current) {
+    onError(error);
+    hasTriggerOnError.current = true;
+  }
+
+  return null;
 }
