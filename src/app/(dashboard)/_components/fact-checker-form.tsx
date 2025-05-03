@@ -5,12 +5,11 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { useAuth } from "@clerk/nextjs";
-import { useRealtimeRun } from "@trigger.dev/react-hooks";
 import { Loader2Icon, SearchIcon } from "lucide-react";
 
 import { Button } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
-import { Fact } from "~/lib/validations";
+import { factSchema } from "~/lib/validations";
 
 function getSearchParams(key: string) {
   const url = new URL(window.location.href);
@@ -42,7 +41,7 @@ export default function FactCheckerForm({ className }: FactCheckerFormProps) {
   const formRef = React.useRef<HTMLFormElement>(null);
   const urlInputRef = React.useRef<HTMLInputElement>(null);
 
-  const [runDetails, setRunDetails] = React.useState<RunDetails | null>(null);
+  // const [runDetails, setRunDetails] = React.useState<RunDetails | null>(null);
 
   const router = useRouter();
   const { isSignedIn } = useAuth();
@@ -65,33 +64,39 @@ export default function FactCheckerForm({ className }: FactCheckerFormProps) {
       return;
     }
 
-    setRunDetails(null);
+    // setRunDetails(null);
     try {
       setIsLoading(true);
       const response = await fetch(`/api/check-fact?url=${url}`);
-      const handle = await response.json();
+      const fact = await response.json();
+      const parsedFact = factSchema.parse(fact);
 
-      setRunDetails(handle);
+      router.push(`/fact/${parsedFact.id}`);
+      // const response = await fetch(`/api/check-fact?url=${url}`);
+      // const handle = await response.json();
+
+      // setRunDetails(handle);
     } catch (error) {
       // TODO: add toast
       console.log("🚀 ~ handleSubmit ~ error:", error);
+    } finally {
       setIsLoading(false);
     }
 
     (ev.target as HTMLFormElement).reset();
   }
 
-  function handleFactComplete(fact: Fact) {
-    console.log("🚀 ~ handleFactComplete ~ fact:", fact);
-    setRunDetails(null);
-    setIsLoading(false);
-    router.push(`/fact/${fact.id}`);
-  }
+  // function handleFactComplete(fact: Fact) {
+  //   console.log("🚀 ~ handleFactComplete ~ fact:", fact);
+  //   setRunDetails(null);
+  //   setIsLoading(false);
+  //   router.push(`/fact/${fact.id}`);
+  // }
 
-  function handleFactError(error: any) {
-    console.log("🚀 ~ handleFactError ~ error:", error);
-    setRunDetails(null);
-  }
+  // function handleFactError(error: any) {
+  //   console.log("🚀 ~ handleFactError ~ error:", error);
+  //   setRunDetails(null);
+  // }
 
   React.useEffect(() => {
     if (hasSearchParam("videoUrl") && urlInputRef.current) {
@@ -109,13 +114,13 @@ export default function FactCheckerForm({ className }: FactCheckerFormProps) {
 
   return (
     <React.Fragment>
-      {runDetails && (
+      {/* {runDetails && (
         <FactRunHandler
           runDetails={runDetails}
           onComplete={handleFactComplete}
           onError={handleFactError}
         />
-      )}
+      )} */}
       <form
         onSubmit={handleSubmit}
         ref={formRef}
@@ -147,34 +152,34 @@ export default function FactCheckerForm({ className }: FactCheckerFormProps) {
   );
 }
 
-function FactRunHandler({
-  runDetails,
-  onComplete,
-  onError,
-}: {
-  runDetails: RunDetails;
-  onComplete: (fact: Fact) => void;
-  onError: (error: any) => void;
-}) {
-  const hasTriggerOnCompleted = React.useRef(false);
-  const hasTriggerOnError = React.useRef(false);
+// function FactRunHandler({
+//   runDetails,
+//   onComplete,
+//   onError,
+// }: {
+//   runDetails: RunDetails;
+//   onComplete: (fact: Fact) => void;
+//   onError: (error: any) => void;
+// }) {
+//   const hasTriggerOnCompleted = React.useRef(false);
+//   const hasTriggerOnError = React.useRef(false);
 
-  const { run, error } = useRealtimeRun(runDetails.id, {
-    accessToken: runDetails.publicAccessToken,
-  });
+//   const { run, error } = useRealtimeRun(runDetails.id, {
+//     accessToken: runDetails.publicAccessToken,
+//   });
 
-  console.log("🚀 ~ FactRunHandler ~ run:", run);
-  console.log("🚀 ~ FactRunHandler ~ error:", error);
+//   console.log("🚀 ~ FactRunHandler ~ run:", run);
+//   console.log("🚀 ~ FactRunHandler ~ error:", error);
 
-  if (run?.output && !hasTriggerOnCompleted.current) {
-    onComplete(run.output as Fact);
-    hasTriggerOnCompleted.current = true;
-  }
+//   if (run?.output && !hasTriggerOnCompleted.current) {
+//     onComplete(run.output as Fact);
+//     hasTriggerOnCompleted.current = true;
+//   }
 
-  if (error && !hasTriggerOnError.current) {
-    onError(error);
-    hasTriggerOnError.current = true;
-  }
+//   if (error && !hasTriggerOnError.current) {
+//     onError(error);
+//     hasTriggerOnError.current = true;
+//   }
 
-  return null;
-}
+//   return null;
+// }
