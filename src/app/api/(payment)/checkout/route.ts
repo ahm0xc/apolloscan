@@ -51,8 +51,8 @@ export async function GET(request: NextRequest) {
     metadata: {
       userId,
     },
-    success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
-    cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
+    success_url: `${process.env.NEXT_PUBLIC_APP_URL}/thanks`,
+    cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/billing`,
   });
 
   return NextResponse.json({ url: session.url });
