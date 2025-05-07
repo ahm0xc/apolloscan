@@ -1,6 +1,6 @@
 import { Redis } from "@upstash/redis";
 
-const PREFIX = "youfact_";
+const PREFIX = "apolloscan_";
 
 const url = process.env.UPSTASH_REDIS_REST_URL;
 const token = process.env.UPSTASH_REDIS_REST_TOKEN;
