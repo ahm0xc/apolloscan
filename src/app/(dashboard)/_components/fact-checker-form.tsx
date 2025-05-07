@@ -99,7 +99,7 @@ export default function FactCheckerForm({ className }: FactCheckerFormProps) {
       onSubmit={handleSubmit}
       ref={formRef}
       className={cn(
-        "h-12 rounded-full flex items-center gap-2 border pr-1 w-[35vw] min-w-[350px] bg-accent",
+        "h-12 rounded-full flex items-center gap-2 border pr-1 w-[50vw] md:w-[40vw] lg:w-[35vw] xl:w-[30vw] min-w-[350px] bg-accent",
         className
       )}
     >
