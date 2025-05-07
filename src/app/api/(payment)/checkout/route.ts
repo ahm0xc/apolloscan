@@ -47,7 +47,9 @@ export async function GET(request: NextRequest) {
     customer: stripeCustomerId,
     mode: "subscription",
     line_items: [{ price: priceId, quantity: 1 }],
-    // TODO: Add success and cancel URLs
+    subscription_data: {
+      trial_period_days: 3,
+    },
     metadata: {
       userId,
     },
