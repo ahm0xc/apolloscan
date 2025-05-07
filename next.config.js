@@ -13,6 +13,15 @@ const config = {
   experimental: {
     reactCompiler: true,
   },
+  async redirects() {
+    return [
+      {
+        source: "/pricing",
+        destination: "/billing",
+        permanent: false,
+      },
+    ];
+  },
 };
 
 export default config;
