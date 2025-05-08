@@ -3,7 +3,7 @@
 import Link from "next/link";
 
 import { ArrowLeft, CheckCircle, Gift, Sparkles } from "lucide-react";
-import { m } from "motion/react";
+import { motion } from "motion/react";
 
 import { Button } from "~/components/ui/button";
 
@@ -69,7 +69,7 @@ export default function ThankYouPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-orange-50 via-amber-50 to-white p-4 text-center">
-      <m.div
+      <motion.div
         className="relative w-full max-w-2xl space-y-8 rounded-3xl bg-white/90 p-10 shadow-2xl backdrop-blur-sm border border-orange-100 overflow-hidden"
         variants={containerVariants}
         initial="hidden"
@@ -88,74 +88,80 @@ export default function ThankYouPage() {
         <div className="absolute -right-10 top-32 h-40 w-[600px] rotate-12 bg-gradient-to-r from-white/10 via-amber-100/20 to-white/5 blur-md"></div>
 
         {/* Decorative elements */}
-        <m.div
+        <motion.div
           className="absolute -left-12 -top-12 rotate-12 text-orange-300 hidden sm:block z-10"
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.5, duration: 0.5 }}
         >
           <Gift className="h-16 w-16" />
-        </m.div>
+        </motion.div>
 
-        <m.div
+        <motion.div
           className="absolute -right-8 bottom-20 -rotate-12 text-amber-400 hidden sm:block z-10"
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.7, duration: 0.5 }}
         >
           <Sparkles className="h-10 w-10" />
-        </m.div>
+        </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8 relative z-10">
           <div className="md:col-span-2 flex flex-col items-center justify-center">
             {/* Success icon with animation */}
-            <m.div className="relative mx-auto mb-6" variants={itemVariants}>
-              <m.div
+            <motion.div
+              className="relative mx-auto mb-6"
+              variants={itemVariants}
+            >
+              <motion.div
                 className="absolute inset-0 -z-10"
                 variants={pulseVariants}
                 animate="pulse"
               >
                 <div className="h-32 w-32 rounded-full bg-orange-400/20 blur-xl" />
-              </m.div>
-              <m.div
+              </motion.div>
+              <motion.div
                 className="flex h-28 w-28 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg border border-white/30"
                 whileHover={{ rotate: 5, scale: 1.05 }}
               >
                 <CheckCircle className="h-14 w-14 text-white" />
-              </m.div>
-            </m.div>
+              </motion.div>
+            </motion.div>
 
             {/* Heading */}
-            <m.div variants={itemVariants} className="text-center">
+            <motion.div variants={itemVariants} className="text-center">
               <h1 className="text-5xl font-bold tracking-tight bg-gradient-to-r from-amber-500 to-orange-600 bg-clip-text text-transparent mb-4">
                 Thank You!
               </h1>
 
               {/* Main text */}
-              <m.p className="text-xl text-gray-700" variants={itemVariants}>
+              <motion.p
+                className="text-xl text-gray-700"
+                variants={itemVariants}
+              >
                 Your Pro plan subscription has been{" "}
                 <span className="font-medium text-orange-500">
                   successfully activated
                 </span>
                 .
-              </m.p>
-            </m.div>
+              </motion.p>
+            </motion.div>
           </div>
 
           <div className="md:col-span-3">
             {/* Benefits section */}
-            <m.div className="space-y-5 pt-2" variants={itemVariants}>
-              <m.div className="flex items-center justify-center gap-2">
+            <motion.div className="space-y-5 pt-2" variants={itemVariants}>
+              <motion.div className="flex items-center justify-center gap-2">
                 <div className="h-px flex-1 bg-gradient-to-r from-transparent to-orange-100"></div>
-                <m.p className="font-medium text-gray-700 text-lg">
+                <motion.p className="font-medium text-gray-700 text-lg">
                   Pro Benefits
-                </m.p>
+                </motion.p>
                 <div className="h-px flex-1 bg-gradient-to-l from-transparent to-orange-100"></div>
-              </m.div>
+              </motion.div>
 
-              <m.ul className="space-y-4 rounded-2xl bg-gradient-to-br from-orange-50 to-amber-50/50 p-6 backdrop-blur-sm border border-orange-100/50 shadow-sm">
+              <motion.ul className="space-y-4 rounded-2xl bg-gradient-to-br from-orange-50 to-amber-50/50 p-6 backdrop-blur-sm border border-orange-100/50 shadow-sm">
                 {benefits.map((benefit, index) => (
-                  <m.li
+                  <motion.li
                     key={index}
                     className="flex items-center text-gray-700"
                     custom={index}
@@ -163,24 +169,24 @@ export default function ThankYouPage() {
                     initial="hidden"
                     animate="visible"
                   >
-                    <m.div
+                    <motion.div
                       className="mr-4 flex h-8 w-8 items-center justify-center rounded-full bg-orange-400/10 text-orange-500"
                       whileHover={{ scale: 1.2, rotate: 10 }}
                     >
                       <CheckCircle className="h-5 w-5" />
-                    </m.div>
+                    </motion.div>
                     <span className="font-medium text-base">{benefit}</span>
-                  </m.li>
+                  </motion.li>
                 ))}
-              </m.ul>
-            </m.div>
+              </motion.ul>
+            </motion.div>
           </div>
         </div>
 
         {/* Action button */}
-        <m.div className="pt-8" variants={itemVariants}>
+        <motion.div className="pt-8" variants={itemVariants}>
           <Link href="/">
-            <m.div
+            <motion.div
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className="rounded-xl overflow-hidden shadow-lg"
@@ -189,30 +195,30 @@ export default function ThankYouPage() {
                 <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
                 <span>Return to Dashboard</span>
               </Button>
-            </m.div>
+            </motion.div>
           </Link>
-        </m.div>
+        </motion.div>
 
         {/* Additional message */}
-        <m.p
+        <motion.p
           className="text-sm text-gray-500 pt-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5 }}
         >
           Check your email for receipt and additional information
-        </m.p>
-      </m.div>
+        </motion.p>
+      </motion.div>
 
       {/* Confetti animation */}
-      <m.div
+      <motion.div
         className="fixed inset-0 pointer-events-none overflow-hidden"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
       >
         {[...Array(25)].map((_, i) => (
-          <m.div
+          <motion.div
             key={i}
             className={`absolute h-2 w-2 rounded-full ${
               i % 3 === 0
@@ -240,7 +246,7 @@ export default function ThankYouPage() {
             }}
           />
         ))}
-      </m.div>
+      </motion.div>
     </div>
   );
 }
