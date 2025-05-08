@@ -93,6 +93,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Invalid YouTube URL" }, { status: 400 });
   }
 
+  const t1 = performance.now();
+
   const { isSubscribed } = await checkSubscription(userId);
 
   if (!isSubscribed) {
@@ -143,7 +145,7 @@ export async function GET(request: NextRequest) {
          `;
 
   const { object: aiResponse } = await generateObject({
-    model: google("gemini-2.5-pro-exp-03-25", {
+    model: google("gemini-2.5-flash-preview-04-17", {
       useSearchGrounding: true,
     }),
     schema: factSchema.omit({
@@ -173,6 +175,10 @@ export async function GET(request: NextRequest) {
   await kv.set(`user:${userId}:lastFactCheck`, new Date().toISOString());
 
   revalidateTag("facts");
+
+  const t2 = performance.now();
+
+  console.log(`Time taken: ${t2 - t1} milliseconds`);
 
   return NextResponse.json(fact);
 }
