@@ -68,18 +68,38 @@ export default function FactCheckerForm({ className }: FactCheckerFormProps) {
     try {
       setIsLoading(true);
       const response = await fetch(`/api/check-fact?url=${url}`);
-      const fact = await response.json();
+      const data = await response.json();
 
-      if (fact.error) throw new Error(fact.error);
+      if (!response.ok) {
+        throw {
+          message: data.error,
+          isSubscriptionRequired: data.isSubscriptionRequired,
+        };
+      }
 
-      const parsed = factSchema.safeParse(fact);
+      const parsed = factSchema.safeParse(data);
 
       if (!parsed.success) throw new Error(parsed.error.message);
 
       router.push(`/fact/${parsed.data.id}`);
-    } catch (error) {
-      // TODO: add toast
-      if (error instanceof Error) {
+    } catch (error: any) {
+      console.log("🚀 ~ handleSubmit ~ error:", error);
+      if (error.isSubscriptionRequired) {
+        toast({
+          title: "Subscription Required",
+          description: error.message,
+          variant: "destructive",
+          action: (
+            <Button
+              variant="default"
+              onClick={() => router.push("/billing")}
+              className="ml-2"
+            >
+              Upgrade Plan
+            </Button>
+          ),
+        });
+      } else if (error.message) {
         toast({
           title: "Error",
           description: error.message,

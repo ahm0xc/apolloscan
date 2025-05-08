@@ -97,14 +97,28 @@ export async function GET(request: NextRequest) {
 
   if (!isSubscribed) {
     const factCount = (await kv.get(`user:${userId}:factCount`)) ?? "0";
-    if (parseInt(factCount as string) >= 10) {
-      return NextResponse.json(
-        {
-          error:
-            "Fact limit reached. Please upgrade to continue using the service.",
-        },
-        { status: 400 }
-      );
+    const lastFactCheck = (await kv.get(`user:${userId}:lastFactCheck`)) ?? "";
+    const lastFactCheckDate = lastFactCheck
+      ? new Date(lastFactCheck as string)
+      : new Date();
+    const daysSinceLastFactCheck = Math.floor(
+      (new Date().getTime() - lastFactCheckDate.getTime()) /
+        (1000 * 60 * 60 * 24)
+    );
+
+    const factCountNum = parseInt(factCount as string);
+
+    if (factCountNum > 10) {
+      if (daysSinceLastFactCheck < 1) {
+        return NextResponse.json(
+          {
+            error:
+              "You have exceeded your free fact checks. You can perform 1 fact check per day. Please try again tomorrow.",
+            isSubscriptionRequired: true,
+          },
+          { status: 400 }
+        );
+      }
     }
   }
 
@@ -156,6 +170,7 @@ export async function GET(request: NextRequest) {
 
   await kv.set(`fact:${userId}:${factId}`, JSON.stringify(fact));
   await kv.increment(`user:${userId}:factCount`);
+  await kv.set(`user:${userId}:lastFactCheck`, new Date().toISOString());
 
   revalidateTag("facts");
 
