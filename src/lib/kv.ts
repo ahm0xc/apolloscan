@@ -26,6 +26,9 @@ export const kv = {
   del: async (key: string) => {
     return await redis.del(`${PREFIX}${key}`);
   },
+  increment: async (key: string) => {
+    return await redis.incr(`${PREFIX}${key}`);
+  },
   keys: async () => {
     return await redis.keys(`${PREFIX}*`);
   },

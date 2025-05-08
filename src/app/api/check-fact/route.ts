@@ -7,6 +7,7 @@ import { generateObject } from "ai";
 import { nanoid } from "nanoid";
 import Innertube from "youtubei.js";
 
+import { checkSubscription } from "~/actions/server-actions";
 import { kv } from "~/lib/kv";
 import { extractYouTubeVideoId, isYoutubeVideoUrl } from "~/lib/utils";
 import { factSchema } from "~/lib/validations";
@@ -92,6 +93,21 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Invalid YouTube URL" }, { status: 400 });
   }
 
+  const { isSubscribed } = await checkSubscription(userId);
+
+  if (!isSubscribed) {
+    const factCount = (await kv.get(`user:${userId}:factCount`)) ?? "0";
+    if (parseInt(factCount as string) >= 10) {
+      return NextResponse.json(
+        {
+          error:
+            "Fact limit reached. Please upgrade to continue using the service.",
+        },
+        { status: 400 }
+      );
+    }
+  }
+
   const factId = nanoid();
 
   const videoId = extractYouTubeVideoId(url) ?? "";
@@ -139,6 +155,7 @@ export async function GET(request: NextRequest) {
   };
 
   await kv.set(`fact:${userId}:${factId}`, JSON.stringify(fact));
+  await kv.increment(`user:${userId}:factCount`);
 
   revalidateTag("facts");
 

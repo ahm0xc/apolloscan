@@ -8,6 +8,7 @@ import { useAuth } from "@clerk/nextjs";
 import { Loader2Icon, SearchIcon } from "lucide-react";
 
 import { Button } from "~/components/ui/button";
+import { useToast } from "~/hooks/use-toast";
 import { cn } from "~/lib/utils";
 import { factSchema } from "~/lib/validations";
 
@@ -43,6 +44,7 @@ export default function FactCheckerForm({ className }: FactCheckerFormProps) {
 
   const router = useRouter();
   const { isSignedIn } = useAuth();
+  const { toast } = useToast();
 
   async function handleSubmit(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
@@ -67,12 +69,29 @@ export default function FactCheckerForm({ className }: FactCheckerFormProps) {
       setIsLoading(true);
       const response = await fetch(`/api/check-fact?url=${url}`);
       const fact = await response.json();
-      const parsedFact = factSchema.parse(fact);
 
-      router.push(`/fact/${parsedFact.id}`);
+      if (fact.error) throw new Error(fact.error);
+
+      const parsed = factSchema.safeParse(fact);
+
+      if (!parsed.success) throw new Error(parsed.error.message);
+
+      router.push(`/fact/${parsed.data.id}`);
     } catch (error) {
       // TODO: add toast
-      console.log("🚀 ~ handleSubmit ~ error:", error);
+      if (error instanceof Error) {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "An unknown error occurred",
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsLoading(false);
     }
