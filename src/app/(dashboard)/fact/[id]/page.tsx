@@ -175,12 +175,12 @@ export default async function FactIDPage({
 
   return (
     <div>
-      <header className="p-8 w-full flex justify-center">
+      <header className="p-4 sm:p-8 w-full flex justify-center">
         <FactCheckerForm />
       </header>
       <div className="grid lg:grid-cols-5">
         <div className="col-span-3">
-          <section className="grid grid-cols-2 gap-4 p-8">
+          <section className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 sm:p-8">
             <div className="flex flex-col gap-2">
               <h1 className="text-sm font-medium">
                 TITLE: {fact.videoDetails.title}
@@ -200,77 +200,76 @@ export default async function FactIDPage({
             </div>
             <div className="flex flex-col items-center justify-center">
               <CircularProgress score={fact.score} />
-              {/* <div className="flex gap-2">
-                <Button variant="default">Download Fact Analysis</Button>
-              </div> */}
             </div>
           </section>
-          <section className="p-8">
-            <div className="bg-white rounded-lg">
-              <div className="flex items-center justify-between px-6 py-4 border-b">
+          <section className="p-4 sm:p-8">
+            <div className="bg-white rounded-lg overflow-x-auto">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between px-4 sm:px-6 py-4 border-b gap-4">
                 <h2 className="text-lg font-medium">Claim Analysis</h2>
                 <div className="flex items-center gap-2">
                   <input
                     type="text"
                     placeholder="Search claims..."
-                    className="px-3 py-1 text-sm border rounded-md w-48 focus:outline-none focus:ring-1 focus:ring-primary"
+                    className="px-3 py-1 text-sm border rounded-md w-full sm:w-48 focus:outline-none focus:ring-1 focus:ring-primary"
                   />
                 </div>
               </div>
-              <table className="w-full border-collapse border border-gray-200">
-                <thead>
-                  <tr className="text-left bg-gray-50">
-                    <th className="px-6 py-3 text-xs font-medium text-muted-foreground border border-gray-200">
-                      <div className="flex items-center gap-1">Claim</div>
-                    </th>
-                    <th className="px-6 py-3 text-xs font-medium text-muted-foreground w-24 border border-gray-200">
-                      <div className="flex items-center gap-1">Score</div>
-                    </th>
-                    <th className="px-6 py-3 text-xs font-medium text-muted-foreground w-24 text-right border border-gray-200">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {fact.claims.map((claim, index) => (
-                    <tr key={index} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 text-sm border border-gray-200">
-                        {claim.claim}
-                      </td>
-                      <td className="px-6 py-4 border border-gray-200">
-                        <CircularProgress
-                          score={claim.score}
-                          size="small"
-                          showLabel={true}
-                        />
-                      </td>
-                      <td className="px-6 py-4 text-right border border-gray-200">
-                        <button className="text-muted-foreground hover:text-foreground">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <circle cx="12" cy="12" r="1"></circle>
-                            <circle cx="19" cy="12" r="1"></circle>
-                            <circle cx="5" cy="12" r="1"></circle>
-                          </svg>
-                        </button>
-                      </td>
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse border border-gray-200 min-w-[600px]">
+                  <thead>
+                    <tr className="text-left bg-gray-50">
+                      <th className="px-4 sm:px-6 py-3 text-xs font-medium text-muted-foreground border border-gray-200">
+                        <div className="flex items-center gap-1">Claim</div>
+                      </th>
+                      <th className="px-4 sm:px-6 py-3 text-xs font-medium text-muted-foreground w-24 border border-gray-200">
+                        <div className="flex items-center gap-1">Score</div>
+                      </th>
+                      <th className="px-4 sm:px-6 py-3 text-xs font-medium text-muted-foreground w-24 text-right border border-gray-200">
+                        Actions
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {fact.claims.map((claim, index) => (
+                      <tr key={index} className="hover:bg-gray-50">
+                        <td className="px-4 sm:px-6 py-4 text-sm border border-gray-200">
+                          {claim.claim}
+                        </td>
+                        <td className="px-4 sm:px-6 py-4 border border-gray-200">
+                          <CircularProgress
+                            score={claim.score}
+                            size="small"
+                            showLabel={true}
+                          />
+                        </td>
+                        <td className="px-4 sm:px-6 py-4 text-right border border-gray-200">
+                          <button className="text-muted-foreground hover:text-foreground">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <circle cx="12" cy="12" r="1"></circle>
+                              <circle cx="19" cy="12" r="1"></circle>
+                              <circle cx="5" cy="12" r="1"></circle>
+                            </svg>
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </section>
         </div>
-        <div className="col-span-2 p-4 w-full">
+        <div className="col-span-3 lg:col-span-2 p-4 w-full">
           <AnalysisSidebar fact={fact} />
         </div>
       </div>
