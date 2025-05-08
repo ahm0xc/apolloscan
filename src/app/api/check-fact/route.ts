@@ -12,7 +12,7 @@ import { kv } from "~/lib/kv";
 import { extractYouTubeVideoId, isYoutubeVideoUrl } from "~/lib/utils";
 import { factSchema } from "~/lib/validations";
 
-export const maxDuration = 60;
+export const maxDuration = 120;
 
 async function getTranscript(id: string) {
   const youtube = await Innertube.create({

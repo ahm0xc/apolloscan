@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 
 import { useRouter } from "next/navigation";
 
@@ -38,7 +38,7 @@ interface FactCheckerFormProps {
 }
 
 export default function FactCheckerForm({ className }: FactCheckerFormProps) {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
   const formRef = React.useRef<HTMLFormElement>(null);
   const urlInputRef = React.useRef<HTMLInputElement>(null);
 
