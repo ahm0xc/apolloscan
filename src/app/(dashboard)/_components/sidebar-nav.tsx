@@ -10,6 +10,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "~/components/ui/sidebar";
 
 export default function SidebarNav({
@@ -23,6 +24,8 @@ export default function SidebarNav({
     icon: LucideIcon;
   }[];
 }) {
+  const { setOpenMobile } = useSidebar();
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>{title}</SidebarGroupLabel>
@@ -30,7 +33,11 @@ export default function SidebarNav({
         {links.map((link) => (
           <SidebarMenuItem key={link.name}>
             <SidebarMenuButton asChild>
-              <Link className="w-full" href={link.url}>
+              <Link
+                className="w-full"
+                href={link.url}
+                onClick={() => setOpenMobile(false)}
+              >
                 <link.icon />
                 <span>{link.name}</span>
               </Link>
