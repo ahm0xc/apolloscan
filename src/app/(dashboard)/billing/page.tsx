@@ -36,14 +36,8 @@ const tiers: Tier[] = [
   {
     name: "Free",
     id: "tier-free",
-    description:
-      "The perfect plan if you're just getting started with our product.",
-    features: [
-      "25 products",
-      "Up to 10,000 subscribers",
-      "Advanced analytics",
-      "24-hour support response time",
-    ],
+    description: "Get started free and check the truth of the internet.",
+    features: ["1 fact check per day", "History retention", "Limited support"],
     featured: false,
     cta: "Get started for free",
   },
@@ -58,14 +52,14 @@ const tiers: Tier[] = [
       monthly: 6.99,
       yearly: 67.99,
     },
-    description: "Dedicated support and infrastructure for your company.",
+    description:
+      "Unlimited fact checks and premium features to help you verify content with confidence.",
     features: [
-      "Unlimited products",
-      "Unlimited subscribers",
-      "Advanced analytics",
-      "Dedicated support representative",
-      "Marketing automations",
-      "Custom integrations",
+      "Unlimited Fact Checks",
+      "History retention",
+      "Priority support",
+      "Export reports",
+      "Early access to new features",
     ],
     featured: true,
     cta: "Start 3 day free trial",
