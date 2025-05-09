@@ -145,7 +145,7 @@ export async function GET(request: NextRequest) {
          `;
 
   const { object: aiResponse } = await generateObject({
-    model: google("gemini-2.0-pro-exp-02-05", {
+    model: google("gemini-2.0-flash", {
       useSearchGrounding: true,
     }),
     schema: factSchema.omit({
