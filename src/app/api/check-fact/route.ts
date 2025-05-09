@@ -145,7 +145,7 @@ export async function GET(request: NextRequest) {
          `;
 
   const { object: aiResponse } = await generateObject({
-    model: google("gemini-2.5-flash-preview-04-17", {
+    model: google("gemini-2.0-pro-exp-02-05", {
       useSearchGrounding: true,
     }),
     schema: factSchema.omit({
@@ -178,7 +178,7 @@ export async function GET(request: NextRequest) {
 
   const t2 = performance.now();
 
-  console.log(`Time taken: ${t2 - t1} milliseconds`);
+  console.log(`fact check time: ${t2 - t1} milliseconds`);
 
   return NextResponse.json(fact);
 }
