@@ -1,5 +1,7 @@
 "use server";
 
+import { cache } from "react";
+
 import { unstable_cache } from "next/cache";
 
 import { kv } from "~/lib/kv";
@@ -26,46 +28,48 @@ export interface SubscriptionData {
   } | null;
 }
 
-export const checkSubscription = async (
-  userId: string
-): Promise<{
-  isSubscribed: boolean;
-  subscription: SubscriptionData | null;
-}> => {
-  try {
-    const stripeCustomerId = (await kv.get(`stripe:user:${userId}`)) as
-      | string
-      | null;
+export const checkSubscription = cache(
+  async (
+    userId: string
+  ): Promise<{
+    isSubscribed: boolean;
+    subscription: SubscriptionData | null;
+  }> => {
+    try {
+      const stripeCustomerId = (await kv.get(`stripe:user:${userId}`)) as
+        | string
+        | null;
 
-    if (!stripeCustomerId) {
+      if (!stripeCustomerId) {
+        return { isSubscribed: false, subscription: null };
+      }
+
+      const subscriptionData = await kv.get(
+        `stripe:customer:${stripeCustomerId}`
+      );
+
+      if (!subscriptionData) {
+        return { isSubscribed: false, subscription: null };
+      }
+
+      const parsedData =
+        typeof subscriptionData === "string"
+          ? JSON.parse(subscriptionData)
+          : subscriptionData;
+
+      const isSubscribed =
+        parsedData.status === "active" || parsedData.status === "trialing";
+
+      return {
+        isSubscribed,
+        subscription: parsedData,
+      };
+    } catch (error) {
+      console.error("Error checking subscription:", error);
       return { isSubscribed: false, subscription: null };
     }
-
-    const subscriptionData = await kv.get(
-      `stripe:customer:${stripeCustomerId}`
-    );
-
-    if (!subscriptionData) {
-      return { isSubscribed: false, subscription: null };
-    }
-
-    const parsedData =
-      typeof subscriptionData === "string"
-        ? JSON.parse(subscriptionData)
-        : subscriptionData;
-
-    const isSubscribed =
-      parsedData.status === "active" || parsedData.status === "trialing";
-
-    return {
-      isSubscribed,
-      subscription: parsedData,
-    };
-  } catch (error) {
-    console.error("Error checking subscription:", error);
-    return { isSubscribed: false, subscription: null };
   }
-};
+);
 
 export const getFacts = unstable_cache(
   async (
