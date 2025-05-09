@@ -9,6 +9,7 @@ import {
   CreditCard,
   LogOut,
   Sparkles,
+  UserIcon,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
@@ -46,9 +47,16 @@ export default function NavUser() {
           // TODO: open auth modal
           <Link
             href="/sign-up"
-            className={cn(buttonVariants({ size: "lg" }), "w-full rounded-xl")}
+            className={cn(
+              buttonVariants({ size: "lg" }),
+              "w-full rounded-xl",
+              "group-data-[state=collapsed]:w-auto group-data-[state=collapsed]:aspect-square group-data-[state=collapsed]:p-0 group-data-[state=collapsed]:size-8"
+            )}
           >
-            Sign Up For Free
+            <UserIcon className="group-data-[state=collapsed]:block hidden" />
+            <span className="group-data-[state=collapsed]:hidden">
+              Sign Up For Free
+            </span>
           </Link>
         )}
         {isSignedIn && (
