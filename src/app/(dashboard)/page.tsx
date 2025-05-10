@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 import { SparkleIcon } from "lucide-react";
 
@@ -31,6 +32,15 @@ export default function Page() {
           <FactCheckerForm />
         </div>
       </section>
+
+      <div className="absolute bottom-4 right-4 text-xs text-muted-foreground">
+        <Link href="/privacy-policy" className="hover:underline mr-4">
+          Privacy Policy
+        </Link>
+        <Link href="/imprint" className="hover:underline">
+          Imprint
+        </Link>
+      </div>
     </div>
   );
 }
