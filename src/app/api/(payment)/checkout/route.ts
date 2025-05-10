@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
     metadata: {
       userId,
     },
-    success_url: `${process.env.NEXT_PUBLIC_APP_URL}/success`,
+    success_url: `${process.env.NEXT_PUBLIC_APP_URL}/api/success`,
     cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/billing`,
   });
 
