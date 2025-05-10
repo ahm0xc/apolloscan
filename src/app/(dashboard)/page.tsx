@@ -34,7 +34,7 @@ export default function Page() {
       </section>
 
       <div className="absolute bottom-4 right-4 text-xs text-muted-foreground">
-        <Link href="/privacy-policy" className="hover:underline mr-4">
+        <Link href="/privacy" className="hover:underline mr-4">
           Privacy Policy
         </Link>
         <Link href="/imprint" className="hover:underline">
