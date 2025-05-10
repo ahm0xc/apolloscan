@@ -151,13 +151,17 @@ export default function NavUser() {
                 </>
               )}
               <DropdownMenuGroup>
-                <DropdownMenuItem>
-                  <BadgeCheck />
-                  Account
+                <DropdownMenuItem asChild>
+                  <Link href="/account">
+                    <BadgeCheck />
+                    Account
+                  </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <CreditCard />
-                  Billing
+                <DropdownMenuItem asChild>
+                  <Link href="/billing">
+                    <CreditCard />
+                    Billing
+                  </Link>
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
