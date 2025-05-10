@@ -22,5 +22,5 @@ export async function GET(req: Request) {
   }
 
   await syncStripeDataToKV(stripeCustomerId);
-  return redirect("/");
+  return redirect("/thanks");
 }
