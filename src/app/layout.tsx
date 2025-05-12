@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 
 import { ClerkProvider } from "@clerk/nextjs";
 import { GeistSans } from "geist/font/sans";
@@ -23,6 +24,11 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <body>
+          <Script
+            defer
+            data-domain="apolloscan.ai"
+            src="https://plausible.io/js/script.outbound-links.tagged-events.js"
+          />
           <TRPCReactProvider>{children}</TRPCReactProvider>
           <Toaster />
         </body>
