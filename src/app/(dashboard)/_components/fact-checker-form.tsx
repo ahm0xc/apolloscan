@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 
 import { useAuth } from "@clerk/nextjs";
 import { Loader2Icon, SearchIcon } from "lucide-react";
+import { usePlausible } from "next-plausible";
 
 import { Button } from "~/components/ui/button";
 import { useToast } from "~/hooks/use-toast";
@@ -43,8 +44,9 @@ export default function FactCheckerForm({ className }: FactCheckerFormProps) {
   const urlInputRef = React.useRef<HTMLInputElement>(null);
 
   const router = useRouter();
-  const { isSignedIn } = useAuth();
+  const { isSignedIn, userId } = useAuth();
   const { toast } = useToast();
+  const plausible = usePlausible();
 
   async function handleSubmit(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
@@ -64,7 +66,6 @@ export default function FactCheckerForm({ className }: FactCheckerFormProps) {
       return;
     }
 
-    // setRunDetails(null);
     try {
       setIsLoading(true);
       const response = await fetch(`/api/check-fact?url=${url}`);
@@ -82,6 +83,12 @@ export default function FactCheckerForm({ className }: FactCheckerFormProps) {
       if (!parsed.success) throw new Error(parsed.error.message);
 
       router.push(`/fact/${parsed.data.id}`);
+      plausible("check-fact", {
+        props: {
+          url,
+          userId,
+        },
+      });
     } catch (error: any) {
       console.log("🚀 ~ handleSubmit ~ error:", error);
       if (error.isSubscriptionRequired) {
