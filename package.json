@@ -49,6 +49,7 @@
     "motion": "^12.10.0",
     "nanoid": "^5.1.5",
     "next": "15.2.1",
+    "next-plausible": "^3.12.4",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "server-only": "^0.0.1",

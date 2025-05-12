@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 
 import { ClerkProvider } from "@clerk/nextjs";
 import { GeistSans } from "geist/font/sans";
+import PlausibleProvider from "next-plausible";
 
 import { Toaster } from "~/components/ui/toaster";
 import "~/styles/globals.css";
@@ -23,12 +23,10 @@ export default function RootLayout({
         className={`${GeistSans.variable}`}
         suppressHydrationWarning
       >
+        <head>
+          <PlausibleProvider domain="apolloscan.ai" />
+        </head>
         <body>
-          <Script
-            defer
-            data-domain="apolloscan.ai"
-            src="https://plausible.io/js/script.outbound-links.tagged-events.js"
-          />
           <TRPCReactProvider>{children}</TRPCReactProvider>
           <Toaster />
         </body>
