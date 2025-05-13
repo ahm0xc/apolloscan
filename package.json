@@ -17,7 +17,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@ahm0xc/utils": "^0.5.1",
+    "@ahm0xc/utils": "^0.5.5",
     "@ai-sdk/google": "^1.2.14",
     "@clerk/backend": "^1.31.2",
     "@clerk/nextjs": "^6.18.1",
