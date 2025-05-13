@@ -11,8 +11,8 @@ export default function Page() {
   return (
     <div className="h-dvh flex flex-col items-center justify-center relative">
       <FloatingImages />
-      <section className="flex flex-col gap-4 items-center px-4 sm:px-6 md:px-8">
-        <div className="border h-6 sm:h-8 rounded-full flex items-center gap-2 px-2 text-xs sm:text-sm text-muted-foreground hover:bg-accent transition-colors">
+      <section className="flex flex-col gap-4 items-center px-4 sm:px-6 md:px-8 z-10">
+        <div className="border h-6 sm:h-8 rounded-full flex items-center gap-2 px-2 text-xs sm:text-sm text-muted-foreground hover:bg-accent transition-colors bg-background">
           <SparkleIcon className="w-3 h-3 sm:w-4 sm:h-4" />
           Boost your productivity
         </div>
@@ -86,7 +86,7 @@ function FloatingImage({
   return (
     <div
       className={cn(
-        "w-fit border-2 border-dashed p-1.5 sm:p-2 rounded-[16px] sm:rounded-[24px]",
+        "w-fit border-2 border-dashed p-1.5 sm:p-2 rounded-[16px] sm:rounded-[24px] -z-0",
         isHighPercentage
           ? "bg-green-50 border-green-100"
           : "bg-red-50 border-red-100",
