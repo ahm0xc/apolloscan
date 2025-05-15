@@ -135,7 +135,7 @@ export async function GET(request: NextRequest) {
 
   const prompt = `I'm giving you a video. you have to check the truthfulness of the video from the web and give it a score between 1 to 100.
          and extract claims that the video made and give it score (1-100) based on its trueness.
-         also return the sources used to check the truthfulness of the video. Give me as many sources as possible and as many claims as possible.
+         also return the sources used to check the truthfulness of the video. Give me as many sources as possible. also provide as accurate claims that the video made.
          
          <video>
             <title>${videoDetails.title}</title>

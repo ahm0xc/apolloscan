@@ -26,7 +26,9 @@ export const factSchema = z.object({
       })
     )
     .min(1)
-    .describe("Claims made by the video, please claims as many as possible"),
+    .describe(
+      "Claims made by the video, please claims as many as possible from the video."
+    ),
   summary: z.string().describe("An analytical summary of the video"),
   sources: z
     .array(z.string())
