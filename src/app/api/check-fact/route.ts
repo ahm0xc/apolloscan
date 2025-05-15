@@ -127,26 +127,27 @@ export async function GET(request: NextRequest) {
   const factId = nanoid();
 
   const videoId = extractYouTubeVideoId(url) ?? "";
-  const transcript = await getTranscript(videoId);
-  if (transcript.error || !transcript.data) {
-    return NextResponse.json({ error: transcript.error }, { status: 400 });
-  }
+  // const transcript = await getTranscript(videoId);
+  // if (transcript.error || !transcript.data) {
+  //   return NextResponse.json({ error: transcript.error }, { status: 400 });
+  // }
   const videoDetails = await getVideoDetails(videoId);
 
   const prompt = `I'm giving you a video. you have to check the truthfulness of the video from the web and give it a score between 1 to 100.
          and extract claims that the video made and give it score (1-100) based on its trueness.
-         also return the sources used to check the truthfulness of the video.
+         also return the sources used to check the truthfulness of the video. Give me as many sources as possible and as many claims as possible.
          
          <video>
             <title>${videoDetails.title}</title>
             <author>${videoDetails.author_name}</author>
-            <transcript>${transcript.data}</transcript>
+            <url>${url}</url>
          </video>
          `;
 
   const { object: aiResponse } = await generateObject({
-    model: google("gemini-2.0-flash", {
+    model: google("gemini-2.5-flash-preview-04-17", {
       useSearchGrounding: true,
+      // cachedContent: videoId,
     }),
     schema: factSchema.omit({
       id: true,

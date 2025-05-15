@@ -26,12 +26,12 @@ export const factSchema = z.object({
       })
     )
     .min(1)
-    .describe("Claims made by the video"),
-  summary: z.string().describe("Summary of the video"),
+    .describe("Claims made by the video, please claims as many as possible"),
+  summary: z.string().describe("An analytical summary of the video"),
   sources: z
     .array(z.string())
     .describe(
-      "Links of the sources used by the video. Only give working links."
+      "Links of the sources used by the video. Only give working links. Always give links to the original source (URLs). add as many links as possible."
     ),
   createdAt: z.string(),
 });
