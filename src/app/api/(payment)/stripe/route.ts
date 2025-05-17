@@ -7,7 +7,7 @@ import type Stripe from "stripe";
 
 import { stripe } from "~/lib/stripe";
 
-import { allowedEvents, syncStripeDataToKV } from "../../utils";
+import { allowedEvents, syncStripeDataToKV } from "../utils";
 
 export async function GET() {
   return NextResponse.json({ message: "This is a webhook endpoint" });
