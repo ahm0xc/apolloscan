@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import { Menu } from "lucide-react";
 
+import { Footer } from "~/components/footer";
 import { Button } from "~/components/ui/button";
 import {
   SidebarInset,
@@ -30,6 +31,7 @@ export default function Layout({ children }: LayoutProps) {
             </SidebarTrigger>
           </div>
           <div className="pt-16 md:pt-0">{children}</div>
+          <Footer />
         </div>
       </SidebarInset>
     </SidebarProvider>

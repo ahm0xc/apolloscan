@@ -4,7 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { GeistSans } from "geist/font/sans";
 import PlausibleProvider from "next-plausible";
 
-import { CookieBanner } from "~/components/ui/cookie-banner";
+import { CookieBanner } from "~/components/cookie-banner";
 import { Toaster } from "~/components/ui/toaster";
 import "~/styles/globals.css";
 import { TRPCReactProvider } from "~/trpc/react";
@@ -27,8 +27,10 @@ export default function RootLayout({
         <head>
           <PlausibleProvider domain="apolloscan.ai" />
         </head>
-        <body>
-          <TRPCReactProvider>{children}</TRPCReactProvider>
+        <body className="flex min-h-screen flex-col">
+          <TRPCReactProvider>
+            <div className="flex-1">{children}</div>
+          </TRPCReactProvider>
           <Toaster />
           <CookieBanner />
         </body>

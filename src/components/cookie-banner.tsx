@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import { Cookie, X } from "lucide-react";
 
-import { Button } from "./button";
+import { Button } from "~/components/ui/button";
 
 export function CookieBanner() {
   const [isVisible, setIsVisible] = useState(false);
