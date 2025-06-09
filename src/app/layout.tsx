@@ -4,6 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { GeistSans } from "geist/font/sans";
 import PlausibleProvider from "next-plausible";
 
+import { AutoTranslate } from "~/components/auto-translate";
 import { CookieBanner } from "~/components/cookie-banner";
 import { Toaster } from "~/components/ui/toaster";
 import "~/styles/globals.css";
@@ -33,6 +34,7 @@ export default function RootLayout({
           </TRPCReactProvider>
           <Toaster />
           <CookieBanner />
+          <AutoTranslate />
         </body>
       </html>
     </ClerkProvider>
