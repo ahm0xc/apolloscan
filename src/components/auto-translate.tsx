@@ -17,6 +17,7 @@ export function AutoTranslate() {
   const [showTranslate, setShowTranslate] = useState(false);
   const [isGermanUser, setIsGermanUser] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isTranslating, setIsTranslating] = useState(false);
 
   useEffect(() => {
     const detectGermanUser = async () => {
@@ -61,15 +62,32 @@ export function AutoTranslate() {
   }, []);
 
   const handleTranslate = () => {
-    // INFO: add google translate script and trigger translation
-    if (!document.getElementById("google_translate_element")) {
-      const script = document.createElement("script");
-      script.src =
-        "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-      document.head.appendChild(script);
+    setIsTranslating(true);
+    setShowTranslate(false);
 
-      // INFO: initialize google translate
-      window.googleTranslateElementInit = () => {
+    // INFO: check if google translate is already loaded
+    if (window.google && window.google.translate) {
+      triggerTranslation();
+      return;
+    }
+
+    // INFO: load google translate script
+    const script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src =
+      "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+
+    // INFO: set up callback before loading script
+    window.googleTranslateElementInit = () => {
+      if (!document.getElementById("google_translate_element")) {
+        // INFO: create container for google translate widget
+        const container = document.createElement("div");
+        container.id = "google_translate_element";
+        container.style.display = "none";
+        document.body.appendChild(container);
+      }
+
+      try {
         new window.google.translate.TranslateElement(
           {
             pageLanguage: "en",
@@ -81,30 +99,59 @@ export function AutoTranslate() {
           "google_translate_element"
         );
 
-        // INFO: auto-trigger german translation
+        // INFO: wait for widget to initialize then trigger translation
         setTimeout(() => {
-          const select = document.querySelector(
-            ".goog-te-combo"
-          ) as HTMLSelectElement;
-          if (select) {
-            select.value = "de";
-            select.dispatchEvent(new Event("change"));
-          }
-        }, 1000);
-      };
-    } else {
-      // INFO: if already loaded, just trigger translation
+          triggerTranslation();
+        }, 2000);
+      } catch (error) {
+        console.error("Google Translate initialization error:", error);
+        setIsTranslating(false);
+      }
+    };
+
+    script.onerror = () => {
+      console.error("Failed to load Google Translate script");
+      setIsTranslating(false);
+    };
+
+    document.head.appendChild(script);
+    localStorage.setItem("translate-accepted", "true");
+  };
+
+  const triggerTranslation = () => {
+    try {
+      // INFO: try multiple methods to trigger translation
       const select = document.querySelector(
         ".goog-te-combo"
       ) as HTMLSelectElement;
       if (select) {
         select.value = "de";
-        select.dispatchEvent(new Event("change"));
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+        setIsTranslating(false);
+        return;
       }
-    }
 
-    setShowTranslate(false);
-    localStorage.setItem("translate-accepted", "true");
+      // INFO: fallback method using google translate api directly
+      if (
+        window.google &&
+        window.google.translate &&
+        window.google.translate.TranslateElement
+      ) {
+        const translateElement =
+          window.google.translate.TranslateElement.getInstance();
+        if (translateElement) {
+          translateElement.showBanner(true);
+          translateElement.translatePage("en", "de");
+        }
+      }
+
+      setTimeout(() => {
+        setIsTranslating(false);
+      }, 3000);
+    } catch (error) {
+      console.error("Translation trigger error:", error);
+      setIsTranslating(false);
+    }
   };
 
   const handleDismiss = () => {
@@ -140,14 +187,16 @@ export function AutoTranslate() {
                 size="sm"
                 variant="secondary"
                 className="bg-white text-blue-600 hover:bg-gray-100"
+                disabled={isTranslating}
               >
-                Ja, übersetzen
+                {isTranslating ? "Übersetzen..." : "Ja, übersetzen"}
               </Button>
               <Button
                 onClick={handleDismiss}
                 size="sm"
                 variant="ghost"
                 className="text-white hover:bg-blue-700"
+                disabled={isTranslating}
               >
                 Nein
               </Button>
@@ -156,6 +205,7 @@ export function AutoTranslate() {
           <button
             onClick={handleDismiss}
             className="text-white hover:text-gray-200 flex-shrink-0"
+            disabled={isTranslating}
           >
             <X className="w-4 h-4" />
           </button>
