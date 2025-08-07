@@ -25,15 +25,15 @@ async function getTranscript(id: string) {
   const segments = transcriptData?.transcript?.content?.body?.initial_segments;
   const transcript = Array.isArray(segments)
     ? segments
-        .filter(
-          (segment: any) =>
-            segment &&
-            segment.snippet &&
-            typeof segment.snippet.text === "string"
-        )
-        .map((segment: any) => ({
-          text: segment.snippet.text,
-        }))
+      .filter(
+        (segment: any) =>
+          segment &&
+          segment.snippet &&
+          typeof segment.snippet.text === "string"
+      )
+      .map((segment: any) => ({
+        text: segment.snippet.text,
+      }))
     : [];
 
   if (transcript.length === 0) {
@@ -105,7 +105,7 @@ export async function GET(request: NextRequest) {
       : new Date();
     const daysSinceLastFactCheck = Math.floor(
       (new Date().getTime() - lastFactCheckDate.getTime()) /
-        (1000 * 60 * 60 * 24)
+      (1000 * 60 * 60 * 24)
     );
 
     const factCountNum = parseInt(factCount as string);
@@ -145,7 +145,7 @@ export async function GET(request: NextRequest) {
          `;
 
   const { object: aiResponse } = await generateObject({
-    model: google("gemini-2.5-flash-preview-04-17", {
+    model: google("gemini-2.5-flash", {
       useSearchGrounding: true,
       // cachedContent: videoId,
     }),
