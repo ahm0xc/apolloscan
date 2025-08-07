@@ -9,7 +9,7 @@ if (!STRIPE_SECRET_KEY) {
 }
 
 export const stripe = new Stripe(STRIPE_SECRET_KEY, {
-  apiVersion: "2025-04-30.basil",
+  apiVersion: "2025-07-30.basil",
 });
 
 export const allowedEvents: Stripe.Event.Type[] = [
@@ -66,11 +66,11 @@ export async function syncStripeDataToKV(customerId: string) {
     cancelAtPeriodEnd: subscription.cancel_at_period_end,
     paymentMethod:
       subscription.default_payment_method &&
-      typeof subscription.default_payment_method !== "string"
+        typeof subscription.default_payment_method !== "string"
         ? {
-            brand: subscription.default_payment_method.card?.brand ?? null,
-            last4: subscription.default_payment_method.card?.last4 ?? null,
-          }
+          brand: subscription.default_payment_method.card?.brand ?? null,
+          last4: subscription.default_payment_method.card?.last4 ?? null,
+        }
         : null,
   };
 
