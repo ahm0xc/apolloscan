@@ -3,12 +3,12 @@
 import Link from "next/link";
 
 import { ArrowLeft, CheckCircle, Gift, Sparkles } from "lucide-react";
-import { motion } from "motion/react";
+import { motion, Variants } from "motion/react";
 
 import { Button } from "~/components/ui/button";
 
 export default function ThankYouPage() {
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -19,7 +19,7 @@ export default function ThankYouPage() {
     },
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { y: 20, opacity: 0 },
     visible: {
       y: 0,
@@ -31,7 +31,7 @@ export default function ThankYouPage() {
     },
   };
 
-  const benefitVariants = {
+  const benefitVariants: Variants = {
     hidden: { x: -10, opacity: 0 },
     visible: (i: number) => ({
       x: 0,
@@ -44,7 +44,7 @@ export default function ThankYouPage() {
     }),
   };
 
-  const pulseVariants = {
+  const pulseVariants: Variants = {
     pulse: {
       scale: [1, 1.05, 1],
       opacity: [0.7, 1, 0.7],
