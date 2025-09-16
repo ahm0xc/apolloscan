@@ -5,9 +5,8 @@ import { google } from "@ai-sdk/google";
 import { auth } from "@clerk/nextjs/server";
 import { generateObject } from "ai";
 import { nanoid } from "nanoid";
-// import Innertube from "youtubei.js";
-
 import { fetchTranscript } from "youtube-transcript-plus";
+import Innertube from "youtubei.js";
 import { z } from "zod";
 
 import { checkSubscription } from "~/actions/server-actions";
@@ -17,58 +16,59 @@ import { Fact, factSchema } from "~/lib/validations";
 
 export const maxDuration = 60;
 
-async function getTranscript(idOrURL: string) {
-  const transcript = await fetchTranscript(idOrURL);
-  return {
-    transcript,
-    plainTranscript: transcript.map(({ text }) => text).join(" "),
-  };
+async function getTranscript(
+  idOrURL: string,
+  { transcriptJoin }: { transcriptJoin: string } = { transcriptJoin: " " }
+) {
+  try {
+    const transcript = await fetchTranscript(idOrURL);
+    return {
+      transcript: transcript.map(({ text }) => text).join(transcriptJoin),
+    };
+  } catch {
+    try {
+      const videoId = extractYouTubeVideoId(idOrURL) ?? "";
+      const youtube = await Innertube.create({
+        lang: "en",
+        location: "US",
+        retrieve_player: false,
+      });
+      const info = await youtube.getInfo(videoId);
+      const transcriptData = await info.getTranscript();
+      const segments =
+        transcriptData?.transcript?.content?.body?.initial_segments;
+      const transcript = Array.isArray(segments)
+        ? segments
+            .filter(
+              (segment) =>
+                segment &&
+                segment.snippet &&
+                typeof segment.snippet.text === "string"
+            )
+            .map((segment) => ({
+              text: segment.snippet.text,
+            }))
+        : [];
+      if (transcript.length === 0) {
+        return {
+          error: "No transcript found",
+        };
+      }
+      const plainTranscript = transcript
+        .map(({ text }) => text)
+        .join(transcriptJoin);
+      if (plainTranscript.trim().length === 0) {
+        throw new Error("Transcript is empty");
+      }
+
+      return {
+        transcript: plainTranscript,
+      };
+    } catch {
+      throw new Error("No transcript found");
+    }
+  }
 }
-
-// async function getTranscript(id: string) {
-//   const youtube = await Innertube.create({
-//     lang: "en",
-//     location: "US",
-//     retrieve_player: false,
-//   });
-//   const info = await youtube.getInfo(id);
-//   const transcriptData = await info.getTranscript();
-//   const segments = transcriptData?.transcript?.content?.body?.initial_segments;
-//   const transcript = Array.isArray(segments)
-//     ? segments
-//       .filter(
-//         (segment: any) =>
-//           segment &&
-//           segment.snippet &&
-//           typeof segment.snippet.text === "string"
-//       )
-//       .map((segment: any) => ({
-//         text: segment.snippet.text,
-//       }))
-//     : [];
-
-//   if (transcript.length === 0) {
-//     return {
-//       error: "No transcript found",
-//     };
-//   }
-
-//   const plainTranscript = transcript
-//     .map(({ text }) => text)
-//     .join(" ")
-//     .replace(/&#39;/g, "'")
-//     .replace(/&nbsp;/g, " ");
-
-//   if (plainTranscript.trim().length === 0) {
-//     return {
-//       error: "Transcript is empty",
-//     };
-//   }
-
-//   return {
-//     data: plainTranscript,
-//   };
-// }
 
 async function getVideoDetails(id: string) {
   const videoDetailsRes = await fetch(
@@ -139,7 +139,7 @@ export async function GET(request: NextRequest) {
 
   const videoId = extractYouTubeVideoId(url) ?? "";
   console.time("getTranscript");
-  const transcript = await getTranscript(url);
+  const { transcript } = await getTranscript(url, { transcriptJoin: "\n" });
   console.timeEnd("getTranscript");
   // if (transcript.error || !transcript.data) {
   //   return NextResponse.json({ error: transcript.error }, { status: 400 });
@@ -160,7 +160,7 @@ export async function GET(request: NextRequest) {
     <url>${url}</url>
    </videoDetails>
    <videoTranscript>
-    ${transcript.transcript.map(({ text }) => text).join("\n")}
+    ${transcript}
    </videoTranscript>
    `;
 
