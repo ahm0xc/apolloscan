@@ -5,59 +5,70 @@ import { google } from "@ai-sdk/google";
 import { auth } from "@clerk/nextjs/server";
 import { generateObject } from "ai";
 import { nanoid } from "nanoid";
-import Innertube from "youtubei.js";
+// import Innertube from "youtubei.js";
+
+import { fetchTranscript } from "youtube-transcript-plus";
+import { z } from "zod";
 
 import { checkSubscription } from "~/actions/server-actions";
 import { kv } from "~/lib/kv";
 import { extractYouTubeVideoId, isYoutubeVideoUrl } from "~/lib/utils";
-import { factSchema } from "~/lib/validations";
+import { Fact, factSchema } from "~/lib/validations";
 
 export const maxDuration = 60;
 
-async function getTranscript(id: string) {
-  const youtube = await Innertube.create({
-    lang: "en",
-    location: "US",
-    retrieve_player: false,
-  });
-  const info = await youtube.getInfo(id);
-  const transcriptData = await info.getTranscript();
-  const segments = transcriptData?.transcript?.content?.body?.initial_segments;
-  const transcript = Array.isArray(segments)
-    ? segments
-      .filter(
-        (segment: any) =>
-          segment &&
-          segment.snippet &&
-          typeof segment.snippet.text === "string"
-      )
-      .map((segment: any) => ({
-        text: segment.snippet.text,
-      }))
-    : [];
-
-  if (transcript.length === 0) {
-    return {
-      error: "No transcript found",
-    };
-  }
-
-  const plainTranscript = transcript
-    .map(({ text }) => text)
-    .join(" ")
-    .replace(/&#39;/g, "'")
-    .replace(/&nbsp;/g, " ");
-
-  if (plainTranscript.trim().length === 0) {
-    return {
-      error: "Transcript is empty",
-    };
-  }
-
+async function getTranscript(idOrURL: string) {
+  const transcript = await fetchTranscript(idOrURL);
   return {
-    data: plainTranscript,
+    transcript,
+    plainTranscript: transcript.map(({ text }) => text).join(" "),
   };
 }
+
+// async function getTranscript(id: string) {
+//   const youtube = await Innertube.create({
+//     lang: "en",
+//     location: "US",
+//     retrieve_player: false,
+//   });
+//   const info = await youtube.getInfo(id);
+//   const transcriptData = await info.getTranscript();
+//   const segments = transcriptData?.transcript?.content?.body?.initial_segments;
+//   const transcript = Array.isArray(segments)
+//     ? segments
+//       .filter(
+//         (segment: any) =>
+//           segment &&
+//           segment.snippet &&
+//           typeof segment.snippet.text === "string"
+//       )
+//       .map((segment: any) => ({
+//         text: segment.snippet.text,
+//       }))
+//     : [];
+
+//   if (transcript.length === 0) {
+//     return {
+//       error: "No transcript found",
+//     };
+//   }
+
+//   const plainTranscript = transcript
+//     .map(({ text }) => text)
+//     .join(" ")
+//     .replace(/&#39;/g, "'")
+//     .replace(/&nbsp;/g, " ");
+
+//   if (plainTranscript.trim().length === 0) {
+//     return {
+//       error: "Transcript is empty",
+//     };
+//   }
+
+//   return {
+//     data: plainTranscript,
+//   };
+// }
 
 async function getVideoDetails(id: string) {
   const videoDetailsRes = await fetch(
@@ -105,7 +116,7 @@ export async function GET(request: NextRequest) {
       : new Date();
     const daysSinceLastFactCheck = Math.floor(
       (new Date().getTime() - lastFactCheckDate.getTime()) /
-      (1000 * 60 * 60 * 24)
+        (1000 * 60 * 60 * 24)
     );
 
     const factCountNum = parseInt(factCount as string);
@@ -127,49 +138,94 @@ export async function GET(request: NextRequest) {
   const factId = nanoid();
 
   const videoId = extractYouTubeVideoId(url) ?? "";
-  // const transcript = await getTranscript(videoId);
+  console.time("getTranscript");
+  const transcript = await getTranscript(url);
+  console.timeEnd("getTranscript");
   // if (transcript.error || !transcript.data) {
   //   return NextResponse.json({ error: transcript.error }, { status: 400 });
   // }
+  console.time("getVideoDetails");
   const videoDetails = await getVideoDetails(videoId);
+  console.timeEnd("getVideoDetails");
 
-  const prompt = `I'm giving you a video. you have to check the truthfulness of the video from the web and give it a score between 1 to 100.
-         and extract claims that the video made and give it score (1-100) based on its trueness.
-         also return the sources used to check the truthfulness of the video. Give me as many sources as possible. also provide as accurate claims that the video made.
-         
-         <video>
-            <title>${videoDetails.title}</title>
-            <author>${videoDetails.author_name}</author>
-            <url>${url}</url>
-         </video>
-         `;
+  const p1 = `You are a claim/fact extractor.
+   You have to extract all the claims/fact that the video made from the given youtube video details and transcript.
+   EXTRACT AS MANY CLAIMS AS POSSIBLE.
+   
+   <videoDetails>
+    <title>${videoDetails.title}</title>
+    <author>${videoDetails.author_name}</author>
+    <thumbnail>${videoDetails.thumbnail_url}</thumbnail>
+    <videoId>${videoId}</videoId>
+    <url>${url}</url>
+   </videoDetails>
+   <videoTranscript>
+    ${transcript.transcript.map(({ text }) => text).join("\n")}
+   </videoTranscript>
+   `;
 
+  console.time("generateObject p1");
+  const { object: claims } = await generateObject({
+    model: google("gemini-1.5-flash-latest"),
+    schema: z.array(z.string()),
+    prompt: p1,
+  });
+  console.timeEnd("generateObject p1");
+
+  const p2 = `You are a expert fact checker.
+   You have to check the truthfulness of the claims/fact (of a video) are listed below.
+   And give me the score (1-100) based on its trueness.
+   Be very accurate and precise with the score.
+   please use latest information and data to check the truthfulness of the claims/fact.
+
+   <VideoDetails>
+   <title>${videoDetails.title}</title>
+   <author>${videoDetails.author_name}</author>
+   </VideoDetails>
+
+   <claims>
+    ${claims.map((claim) => `- ${claim}`).join("\n")}
+   </claims>
+   `;
+
+  console.time("generateObject p2");
   const { object: aiResponse } = await generateObject({
-    model: google("gemini-2.5-flash", {
-      useSearchGrounding: true,
-      // cachedContent: videoId,
-    }),
+    model: google("gemini-2.0-flash"),
+    // model: xai("grok-3-mini"),
+    providerOptions: {
+      xai: {
+        reasoningEffort: "low",
+        searchParameters: {
+          mode: "on", // 'auto', 'on', or 'off'
+          returnCitations: true,
+          maxSearchResults: 5,
+        },
+      },
+    },
     schema: factSchema.omit({
       id: true,
       createdAt: true,
       videoDetails: true,
     }),
-    prompt,
-    maxRetries: 2,
+    prompt: p2,
   });
+  console.timeEnd("generateObject p2");
 
-  const fact = {
+  const fact: Fact = {
     id: factId,
-    createdAt: new Date().toISOString(),
     videoDetails: {
       title: videoDetails.title,
-      author: videoDetails.author_name,
       thumbnail: videoDetails.thumbnail_url,
       videoId,
       url,
     },
     ...aiResponse,
+    createdAt: new Date().toISOString(),
   };
+
+  console.log(fact);
+
+  factSchema.parse(fact);
 
   await kv.set(`fact:${userId}:${factId}`, JSON.stringify(fact));
   await kv.increment(`user:${userId}:factCount`);

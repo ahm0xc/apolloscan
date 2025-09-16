@@ -96,6 +96,9 @@ function SourcesTab({ fact }: { fact: Fact }) {
   const isLink = (source: string) => {
     return source.startsWith("http");
   };
+
+  const sources = fact.claims.map((claim) => claim.sources).flat();
+
   return (
     <div>
       <div className="bg-secondary/30 p-4 rounded-lg">
@@ -109,7 +112,7 @@ function SourcesTab({ fact }: { fact: Fact }) {
       </div>
       <div aria-label="Sources" className="mt-4">
         <div className="flex flex-col gap-3">
-          {fact.sources.map((source) => {
+          {sources.map((source) => {
             const il = isLink(source);
             return (
               <div
