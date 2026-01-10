@@ -49,7 +49,7 @@
     "lucide-react": "^0.537.0",
     "motion": "^12.10.0",
     "nanoid": "^5.1.5",
-    "next": "15.2.1",
+    "next": "15.2.8",
     "next-plausible": "^3.12.4",
     "react": "19.0.0",
     "react-dom": "19.0.0",
