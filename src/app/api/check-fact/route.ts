@@ -104,8 +104,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Invalid YouTube URL" }, { status: 400 });
   }
 
-  const t1 = performance.now();
-
   const { isSubscribed } = await checkSubscription(userId);
 
   if (!isSubscribed) {
@@ -138,15 +136,11 @@ export async function GET(request: NextRequest) {
   const factId = nanoid();
 
   const videoId = extractYouTubeVideoId(url) ?? "";
-  console.time("getTranscript");
   const { transcript } = await getTranscript(url, { transcriptJoin: "\n" });
-  console.timeEnd("getTranscript");
   // if (transcript.error || !transcript.data) {
   //   return NextResponse.json({ error: transcript.error }, { status: 400 });
   // }
-  console.time("getVideoDetails");
   const videoDetails = await getVideoDetails(videoId);
-  console.timeEnd("getVideoDetails");
 
   const p1 = `You are a claim/fact extractor.
    You have to extract all the claims/fact that the video made from the given youtube video details and transcript.
@@ -164,13 +158,11 @@ export async function GET(request: NextRequest) {
    </videoTranscript>
    `;
 
-  console.time("generateObject p1");
   const { object: claims } = await generateObject({
     model: google("gemini-1.5-flash-latest"),
     schema: z.array(z.string()),
     prompt: p1,
   });
-  console.timeEnd("generateObject p1");
 
   const p2 = `You are a expert fact checker.
    You have to check the truthfulness of the claims/fact (of a video) are listed below.
@@ -188,7 +180,6 @@ export async function GET(request: NextRequest) {
    </claims>
    `;
 
-  console.time("generateObject p2");
   const { object: aiResponse } = await generateObject({
     model: google("gemini-2.0-flash"),
     // model: xai("grok-3-mini"),
@@ -209,7 +200,6 @@ export async function GET(request: NextRequest) {
     }),
     prompt: p2,
   });
-  console.timeEnd("generateObject p2");
 
   const fact: Fact = {
     id: factId,
@@ -223,8 +213,6 @@ export async function GET(request: NextRequest) {
     createdAt: new Date().toISOString(),
   };
 
-  console.log(fact);
-
   factSchema.parse(fact);
 
   await kv.set(`fact:${userId}:${factId}`, JSON.stringify(fact));
@@ -234,8 +222,6 @@ export async function GET(request: NextRequest) {
   revalidateTag("facts");
 
   const t2 = performance.now();
-
-  console.log(`fact check time: ${t2 - t1} milliseconds`);
 
   return NextResponse.json(fact);
 }
