@@ -3,10 +3,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { google } from "@ai-sdk/google";
 import { auth } from "@clerk/nextjs/server";
-import { generateObject } from "ai";
+import { Output, generateText } from "ai";
 import { nanoid } from "nanoid";
+import { YoutubeTranscript } from "youtube-transcript";
 import { fetchTranscript } from "youtube-transcript-plus";
-import Innertube from "youtubei.js";
 import { z } from "zod";
 
 import { checkSubscription } from "~/actions/server-actions";
@@ -28,38 +28,15 @@ async function getTranscript(
   } catch {
     try {
       const videoId = extractYouTubeVideoId(idOrURL) ?? "";
-      const youtube = await Innertube.create({
-        lang: "en",
-        location: "US",
-        retrieve_player: false,
-      });
-      const info = await youtube.getInfo(videoId);
-      const transcriptData = await info.getTranscript();
-      const segments =
-        transcriptData?.transcript?.content?.body?.initial_segments;
-      const transcript = Array.isArray(segments)
-        ? segments
-            .filter(
-              (segment) =>
-                segment &&
-                segment.snippet &&
-                typeof segment.snippet.text === "string"
-            )
-            .map((segment) => ({
-              text: segment.snippet.text,
-            }))
-        : [];
-      if (transcript.length === 0) {
-        return {
-          error: "No transcript found",
-        };
-      }
+
+      const transcript = await YoutubeTranscript.fetchTranscript(videoId);
+
       const plainTranscript = transcript
-        .map(({ text }) => text)
-        .join(transcriptJoin);
-      if (plainTranscript.trim().length === 0) {
-        throw new Error("Transcript is empty");
-      }
+        .map((entry) => entry.text)
+        .join(" ")
+        .trim();
+
+      if (!plainTranscript.length) throw new Error("No transcript found");
 
       return {
         transcript: plainTranscript,
@@ -135,6 +112,8 @@ export async function GET(request: NextRequest) {
 
   const factId = nanoid();
 
+  const t1 = performance.now();
+
   const videoId = extractYouTubeVideoId(url) ?? "";
   const { transcript } = await getTranscript(url, { transcriptJoin: "\n" });
   // if (transcript.error || !transcript.data) {
@@ -158,9 +137,11 @@ export async function GET(request: NextRequest) {
    </videoTranscript>
    `;
 
-  const { object: claims } = await generateObject({
-    model: google("gemini-1.5-flash-latest"),
-    schema: z.array(z.string()),
+  const { output: claims } = await generateText({
+    model: google("gemini-2.5-flash-lite"),
+    output: Output.object({
+      schema: z.array(z.string()),
+    }),
     prompt: p1,
   });
 
@@ -180,23 +161,24 @@ export async function GET(request: NextRequest) {
    </claims>
    `;
 
-  const { object: aiResponse } = await generateObject({
-    model: google("gemini-2.0-flash"),
-    // model: xai("grok-3-mini"),
-    providerOptions: {
-      xai: {
-        reasoningEffort: "low",
-        searchParameters: {
-          mode: "on", // 'auto', 'on', or 'off'
-          returnCitations: true,
-          maxSearchResults: 5,
-        },
-      },
-    },
-    schema: factSchema.omit({
-      id: true,
-      createdAt: true,
-      videoDetails: true,
+  const { output: aiResponse } = await generateText({
+    model: google("gemini-2.5-flash"),
+    // providerOptions: {
+    //   xai: {
+    //     reasoningEffort: "low",
+    //     searchParameters: {
+    //       mode: "on", // 'auto', 'on', or 'off'
+    //       returnCitations: true,
+    //       maxSearchResults: 5,
+    //     },
+    //   },
+    // },
+    output: Output.object({
+      schema: factSchema.omit({
+        id: true,
+        createdAt: true,
+        videoDetails: true,
+      }),
     }),
     prompt: p2,
   });
@@ -219,9 +201,11 @@ export async function GET(request: NextRequest) {
   await kv.increment(`user:${userId}:factCount`);
   await kv.set(`user:${userId}:lastFactCheck`, new Date().toISOString());
 
-  revalidateTag("facts");
-
   const t2 = performance.now();
+
+  console.log(`Total time ${Math.round((t2 - t1) / 1000)}s`);
+
+  revalidateTag("facts");
 
   return NextResponse.json(fact);
 }
