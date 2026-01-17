@@ -1,12 +1,14 @@
 import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
+import { tryCatch } from "@ahm0xc/utils";
 import { google } from "@ai-sdk/google";
 import { auth } from "@clerk/nextjs/server";
 import { Output, generateText } from "ai";
 import { nanoid } from "nanoid";
 import { YoutubeTranscript } from "youtube-transcript";
 import { fetchTranscript } from "youtube-transcript-plus";
+import { Innertube } from "youtubei.js";
 import { z } from "zod";
 
 import { checkSubscription } from "~/actions/server-actions";
@@ -14,51 +16,7 @@ import { kv } from "~/lib/kv";
 import { extractYouTubeVideoId, isYoutubeVideoUrl } from "~/lib/utils";
 import { Fact, factSchema } from "~/lib/validations";
 
-export const maxDuration = 60;
-
-async function getTranscript(
-  idOrURL: string,
-  { transcriptJoin }: { transcriptJoin: string } = { transcriptJoin: " " }
-) {
-  try {
-    const transcript = await fetchTranscript(idOrURL);
-    return {
-      transcript: transcript.map(({ text }) => text).join(transcriptJoin),
-    };
-  } catch {
-    try {
-      const videoId = extractYouTubeVideoId(idOrURL) ?? "";
-
-      const transcript = await YoutubeTranscript.fetchTranscript(videoId);
-
-      const plainTranscript = transcript
-        .map((entry) => entry.text)
-        .join(" ")
-        .trim();
-
-      if (!plainTranscript.length) throw new Error("No transcript found");
-
-      return {
-        transcript: plainTranscript,
-      };
-    } catch {
-      throw new Error("No transcript found");
-    }
-  }
-}
-
-async function getVideoDetails(id: string) {
-  const videoDetailsRes = await fetch(
-    `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${id}&format=json`
-  );
-  const videoDetails = await videoDetailsRes.json();
-
-  return videoDetails as {
-    title: string;
-    author_name: string;
-    thumbnail_url: string;
-  };
-}
+export const maxDuration = 300;
 
 export async function GET(request: NextRequest) {
   const { userId } = await auth();
@@ -115,10 +73,24 @@ export async function GET(request: NextRequest) {
   const t1 = performance.now();
 
   const videoId = extractYouTubeVideoId(url) ?? "";
-  const { transcript } = await getTranscript(url, { transcriptJoin: "\n" });
-  // if (transcript.error || !transcript.data) {
-  //   return NextResponse.json({ error: transcript.error }, { status: 400 });
-  // }
+
+  if (!videoId) {
+    return NextResponse.json(
+      { error: "Failed to get video Id" },
+      { status: 400 }
+    );
+  }
+
+  const { error: transcriptError, transcript } = await getTranscript(url, {
+    transcriptJoin: "\n",
+  });
+
+  if (transcriptError || !transcript) {
+    return NextResponse.json(
+      { error: transcriptError ?? "Failed to get transcript" },
+      { status: 400 }
+    );
+  }
   const videoDetails = await getVideoDetails(videoId);
 
   const p1 = `You are a claim/fact extractor.
@@ -163,16 +135,6 @@ export async function GET(request: NextRequest) {
 
   const { output: aiResponse } = await generateText({
     model: google("gemini-2.5-flash"),
-    // providerOptions: {
-    //   xai: {
-    //     reasoningEffort: "low",
-    //     searchParameters: {
-    //       mode: "on", // 'auto', 'on', or 'off'
-    //       returnCitations: true,
-    //       maxSearchResults: 5,
-    //     },
-    //   },
-    // },
     output: Output.object({
       schema: factSchema.omit({
         id: true,
@@ -208,4 +170,72 @@ export async function GET(request: NextRequest) {
   revalidateTag("facts");
 
   return NextResponse.json(fact);
+}
+
+async function getVideoDetails(id: string) {
+  const videoDetailsRes = await fetch(
+    `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${id}&format=json`
+  );
+  const videoDetails = await videoDetailsRes.json();
+
+  return videoDetails as {
+    title: string;
+    author_name: string;
+    thumbnail_url: string;
+  };
+}
+
+async function getTranscript(
+  videoId: string,
+  { transcriptJoin }: { transcriptJoin: string } = { transcriptJoin: " " }
+) {
+  const [t1, t1Error] = await tryCatch(fetchTranscript(videoId));
+
+  if (!t1Error && t1) {
+    console.log("🟡 transcript from t1");
+    return {
+      transcript: t1.map(({ text }) => text).join(transcriptJoin),
+    };
+  }
+
+  const [t2, t2Error] = await tryCatch(
+    YoutubeTranscript.fetchTranscript(videoId)
+  );
+
+  if (!t2Error && t2) {
+    console.log("🟡 transcript from t2");
+    return {
+      transcript: t2.map(({ text }) => text).join(transcriptJoin),
+    };
+  }
+
+  async function innnerTubeTranscription(videoId: string) {
+    const youtube = await Innertube.create();
+    const info = await youtube.getInfo(videoId);
+    const transcriptData = await info.getTranscript();
+    const transcript =
+      transcriptData.transcript.content?.body?.initial_segments.map(
+        (segment) => {
+          return {
+            text: segment.snippet.text,
+          };
+        }
+      );
+
+    return transcript?.join(transcriptJoin);
+  }
+
+  const [t3, t3Error] = await tryCatch(innnerTubeTranscription(videoId));
+
+  if (!t3Error && t3) {
+    console.log("🟡 transcript from t3");
+    return {
+      transcript: t3,
+    };
+  }
+
+  return {
+    transcript: null,
+    error: "You couldn't find any transcript for this video.",
+  };
 }
